@@ -7,8 +7,7 @@ const HeroBanner: React.FC = () => {
     <div className="px-4 sm:px-6 lg:px-8 mt-6 mb-6">
       <div className="max-w-7xl mx-auto">
         <div
-          className="py-8 sm:py-12 bg-cover bg-center rounded-2xl"
-          style={{ backgroundImage: "url('/adinsertion_banner.png')" }}
+          className="py-8 sm:py-12 bg-cover bg-center rounded-2xl hero-banner"
         >
           <div className="flex items-center justify-center text-center px-4">
             <div>

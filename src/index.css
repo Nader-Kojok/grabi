@@ -428,3 +428,14 @@
 .search-input:focus {
   @apply ring-2 ring-[#E00201]/30 border-[#E00201];
 }
+
+/* Responsive hero banner backgrounds */
+.hero-banner {
+  background-image: url('/adinsertion_banner_mobile.png');
+}
+
+@media (min-width: 768px) {
+  .hero-banner {
+    background-image: url('/adinsertion_banner.png');
+  }
+}

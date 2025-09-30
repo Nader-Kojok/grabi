@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, User, Phone, Facebook, Chrome, Check, X } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
 
 const RegisterPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -107,25 +109,27 @@ const RegisterPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-8">
-          {/* Header */}
-          <div className="text-center">
-            <Link to="/">
-              <img 
-                src="/logo.svg" 
-                alt="Grabi" 
-                className="h-12 w-auto mx-auto mb-6"
-              />
-            </Link>
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">
-              Créer un compte
-            </h2>
-            <p className="text-gray-600">
-              Rejoignez la communauté Grabi
-            </p>
-          </div>
+    <div className="min-h-screen bg-background">
+      <Header />
+      <div className="bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-md w-full space-y-8">
+          <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-8">
+            {/* Header */}
+            <div className="text-center">
+              <Link to="/">
+                <img 
+                  src="/logo.svg" 
+                  alt="Grabi" 
+                  className="h-12 w-auto mx-auto mb-6"
+                />
+              </Link>
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                Créer un compte
+              </h2>
+              <p className="text-gray-600">
+                Rejoignez la communauté Grabi
+              </p>
+            </div>
 
           {/* Social Registration */}
           <div className="mt-8 space-y-3">
@@ -414,7 +418,9 @@ const RegisterPage: React.FC = () => {
             </p>
           </div>
         </div>
+        </div>
       </div>
+      <Footer />
     </div>
   );
 };

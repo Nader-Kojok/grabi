@@ -264,10 +264,12 @@ const Header: React.FC = () => {
                   <Plus className="h-4 w-4 mr-1" />
                   <span className="hidden lg:inline">Publier</span>
                 </Button>
-                <Button variant="ghost" className="text-gray-600 hover:text-gray-800 font-normal">
-                  <User className="h-4 w-4 mr-1" />
-                  <span className="hidden lg:inline">Connexion</span>
-                </Button>
+                <Link to="/login">
+                  <Button variant="ghost" className="text-gray-600 hover:text-gray-800 font-normal">
+                    <User className="h-4 w-4 mr-1" />
+                    <span className="hidden lg:inline">Connexion</span>
+                  </Button>
+                </Link>
               </div>
               
               {/* Mobile Menu Button */}
@@ -329,7 +331,7 @@ const Header: React.FC = () => {
               </Link>
               
               <Link 
-                to="/connexion" 
+                to="/login" 
                 className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
                 onClick={() => setShowMobileMenu(false)}
               >
