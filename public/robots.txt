@@ -1,0 +1,35 @@
+# Robots.txt for Grabi - Petites Annonces
+# Site: https://grabi.sn
+
+User-agent: *
+Allow: /
+
+# Allow crawling of main pages
+Allow: /categories
+Allow: /announces
+Allow: /login
+Allow: /register
+
+# Disallow sensitive areas
+Disallow: /admin/
+Disallow: /api/
+Disallow: /private/
+Disallow: /*.json$
+Disallow: /*?*
+
+# Allow specific file types
+Allow: *.css
+Allow: *.js
+Allow: *.png
+Allow: *.jpg
+Allow: *.jpeg
+Allow: *.gif
+Allow: *.svg
+Allow: *.webp
+Allow: *.ico
+
+# Crawl delay (optional - helps prevent server overload)
+Crawl-delay: 1
+
+# Sitemap location (you may want to add this when you create a sitemap)
+# Sitemap: https://grabi.sn/sitemap.xml
