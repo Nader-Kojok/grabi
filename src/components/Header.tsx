@@ -17,6 +17,7 @@ const Header: React.FC = () => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
   const [showMegaMenu, setShowMegaMenu] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [hoverTimeout, setHoverTimeout] = useState<number | null>(null);
   const [exitTimeout, setExitTimeout] = useState<number | null>(null);
 
@@ -227,8 +228,8 @@ const Header: React.FC = () => {
               </Link>
             </div>
 
-            {/* Categories Button */}
-            <div className="flex items-center ml-8">
+            {/* Categories Button - Hidden on mobile */}
+            <div className="hidden md:flex items-center ml-8">
               <Link to="/categories">
                 <Button variant="outline" className="flex items-center gap-2 border-gray-300 text-gray-700 hover:bg-gray-50">
                   <Menu className="h-4 w-4" />
@@ -237,8 +238,8 @@ const Header: React.FC = () => {
               </Link>
             </div>
 
-            {/* Search Bar */}
-            <div className="flex-1 max-w-md mx-6">
+            {/* Search Bar - Responsive */}
+            <div className="flex-1 max-w-md mx-2 md:mx-6">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                 <Input
@@ -249,26 +250,107 @@ const Header: React.FC = () => {
               </div>
             </div>
 
-            {/* User Actions */}
-            <div className="flex items-center space-x-3">
-              <Link to="/annonces">
+            {/* User Actions - Responsive */}
+            <div className="flex items-center space-x-1 md:space-x-3">
+              {/* Desktop Actions */}
+              <div className="hidden md:flex items-center space-x-3">
+                <Link to="/annonces">
+                  <Button variant="ghost" className="text-gray-600 hover:text-gray-800 font-normal">
+                    <Menu className="h-4 w-4 mr-1" />
+                    <span className="hidden lg:inline">Annonces</span>
+                  </Button>
+                </Link>
                 <Button variant="ghost" className="text-gray-600 hover:text-gray-800 font-normal">
-                  <Menu className="h-4 w-4 mr-1" />
-                  Annonces
+                  <Plus className="h-4 w-4 mr-1" />
+                  <span className="hidden lg:inline">Publier</span>
                 </Button>
-              </Link>
-              <Button variant="ghost" className="text-gray-600 hover:text-gray-800 font-normal">
-                <Plus className="h-4 w-4 mr-1" />
-                Publier
-              </Button>
-              <Button variant="ghost" className="text-gray-600 hover:text-gray-800 font-normal">
-                <User className="h-4 w-4 mr-1" />
-                Connexion
-              </Button>
+                <Button variant="ghost" className="text-gray-600 hover:text-gray-800 font-normal">
+                  <User className="h-4 w-4 mr-1" />
+                  <span className="hidden lg:inline">Connexion</span>
+                </Button>
+              </div>
+              
+              {/* Mobile Menu Button */}
+              <div className="md:hidden">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="p-2"
+                  onClick={() => setShowMobileMenu(!showMobileMenu)}
+                >
+                  <Menu className="h-5 w-5" />
+                </Button>
+              </div>
             </div>
           </div>
         </div>
       </header>
+
+      {/* Mobile Menu Overlay */}
+      {showMobileMenu && (
+        <div className="md:hidden fixed inset-0 z-50" onClick={() => setShowMobileMenu(false)}>
+          {/* Backdrop with blur effect - using backdrop-blur and lower opacity */}
+          <div className="absolute inset-0 bg-white/10 backdrop-blur-md backdrop-brightness-75"></div>
+          
+          {/* Mobile Menu Panel - slides from right */}
+          <div className="absolute right-0 top-0 bg-white w-64 h-full shadow-xl transform transition-transform duration-300 ease-in-out" onClick={(e) => e.stopPropagation()}>
+            <div className="p-4 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <img src="/logo.svg" alt="Grabi" className="h-8 w-auto" />
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="p-2"
+                  onClick={() => setShowMobileMenu(false)}
+                >
+                  <span className="text-xl">&times;</span>
+                </Button>
+              </div>
+            </div>
+            
+            <div className="p-4 space-y-4">
+              {/* Mobile Navigation Items */}
+              <Link 
+                to="/annonces" 
+                className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                onClick={() => setShowMobileMenu(false)}
+              >
+                <Menu className="h-5 w-5 text-gray-600" />
+                <span className="text-gray-800 font-medium">Annonces</span>
+              </Link>
+              
+              <Link 
+                to="/publier" 
+                className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                onClick={() => setShowMobileMenu(false)}
+              >
+                <Plus className="h-5 w-5 text-gray-600" />
+                <span className="text-gray-800 font-medium">Publier</span>
+              </Link>
+              
+              <Link 
+                to="/connexion" 
+                className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                onClick={() => setShowMobileMenu(false)}
+              >
+                <User className="h-5 w-5 text-gray-600" />
+                <span className="text-gray-800 font-medium">Connexion</span>
+              </Link>
+              
+              <div className="border-t border-gray-200 pt-4">
+                <Link 
+                  to="/categories" 
+                  className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                  onClick={() => setShowMobileMenu(false)}
+                >
+                  <Menu className="h-5 w-5 text-gray-600" />
+                  <span className="text-gray-800 font-medium">Toutes les catégories</span>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Category Navigation Bar with Mega Menu */}
       <div className="bg-gray-50 border-b border-gray-200 relative">

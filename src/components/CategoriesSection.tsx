@@ -1,7 +1,18 @@
-import React from 'react';
-import { Car, Home, Smartphone, Shirt, Wrench, Briefcase, MapPin, Baby, Hammer, Package } from 'lucide-react';
+import React, { useState } from 'react';
+import { Car, Home, Smartphone, Shirt, Wrench, Briefcase, MapPin, Baby, Hammer, Package, ChevronDown, ChevronUp } from 'lucide-react';
 
 const CategoriesSection: React.FC = () => {
+  const [expandedCategories, setExpandedCategories] = useState<Set<number>>(new Set());
+
+  const toggleCategory = (index: number) => {
+    const newExpanded = new Set(expandedCategories);
+    if (newExpanded.has(index)) {
+      newExpanded.delete(index);
+    } else {
+      newExpanded.add(index);
+    }
+    setExpandedCategories(newExpanded);
+  };
   const categories = [
     {
       title: 'Véhicules',
@@ -141,9 +152,62 @@ const CategoriesSection: React.FC = () => {
   ];
 
   return (
-    <section className="py-12 bg-white">
+    <section className="py-6 md:py-12 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-0">
+        {/* Mobile Layout - Expandable accordion */}
+        <div className="md:hidden space-y-2">
+          {categories.map((category, index) => {
+            const isExpanded = expandedCategories.has(index);
+            return (
+              <div key={index} className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+                <button
+                  onClick={() => toggleCategory(index)}
+                  className="w-full px-4 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors duration-200"
+                >
+                  <div className="flex items-center space-x-3">
+                    <div className={`${category.color}`}>
+                      {category.icon}
+                    </div>
+                    <h3 className={`font-semibold text-sm ${category.color}`}>
+                      {category.title}
+                    </h3>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-xs text-gray-500">
+                      {category.subcategories.length}
+                    </span>
+                    {isExpanded ? (
+                      <ChevronUp className="w-4 h-4 text-gray-400" />
+                    ) : (
+                      <ChevronDown className="w-4 h-4 text-gray-400" />
+                    )}
+                  </div>
+                </button>
+                
+                <div className={`transition-all duration-300 ease-in-out ${
+                  isExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+                } overflow-hidden`}>
+                  <div className="px-4 pb-4 pt-2 bg-gray-50 border-t border-gray-100">
+                    <div className="grid grid-cols-2 gap-2">
+                      {category.subcategories.map((subcategory, subIndex) => (
+                        <a
+                          key={subIndex}
+                          href="#"
+                          className="text-xs text-gray-600 hover:text-gray-900 hover:bg-white px-2 py-1.5 rounded transition-colors duration-200 block"
+                        >
+                          {subcategory}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Desktop Layout - Original grid */}
+        <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-0">
           {categories.map((category, index) => (
             <div 
               key={index} 

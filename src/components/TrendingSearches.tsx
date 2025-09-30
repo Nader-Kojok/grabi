@@ -43,12 +43,12 @@ const TrendingSearches: React.FC = () => {
   return (
     <div className="bg-[#F9FAFB] py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-2">
           <div className="flex items-center gap-2">
             <TrendingUp className="h-5 w-5 text-red-600" />
             <h2 className="text-xl font-bold text-gray-900">Recherches tendances</h2>
           </div>
-          <span className="text-sm text-gray-500">Mis à jour en temps réel</span>
+          <span className="text-sm text-gray-500 items-left flex">Mis à jour en temps réel</span>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

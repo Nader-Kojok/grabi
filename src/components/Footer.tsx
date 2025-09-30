@@ -55,7 +55,7 @@ const Footer: React.FC = () => {
 
           {/* Contact */}
           <div className="space-y-4">
-            <h3 className="text-white text-lg font-semibold text-center">Contact</h3>
+            <h3 className="text-white text-lg font-semibold">Contact</h3>
             <div className="space-y-3 text-sm">
               <div className="flex items-center justify-center space-x-2">
                 <Phone size={16} className="text-gray-400" />
@@ -67,7 +67,7 @@ const Footer: React.FC = () => {
               </div>
               <div className="flex items-start justify-center space-x-2">
                 <MapPin size={16} className="text-gray-400 mt-0.5" />
-                <span className="text-gray-300 text-center">
+                <span className="text-gray-300">
                   Dakar, Sénégal
                 </span>
               </div>
@@ -78,8 +78,19 @@ const Footer: React.FC = () => {
         {/* Bottom Section */}
         <div className="border-t border-gray-800 mt-8 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-            <div className="text-sm text-gray-400">
-              © 2024 Grabi. Tous droits réservés.
+            <div className="text-sm text-gray-400 text-center md:text-left">
+              <div>© 2024 Grabi. Tous droits réservés.</div>
+              <div>
+                Developed with ❤️ by{' '}
+                <a 
+                  href="https://www.agencearcane.com" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="text-gray-300 hover:text-white transition-colors"
+                >
+                  Agence Arcane
+                </a>
+              </div>
             </div>
             <div className="flex space-x-6 text-sm">
               <a href="#" className="text-gray-400 hover:text-white transition-colors">
