@@ -16,7 +16,7 @@ const LoginPage: React.FC = () => {
   const [error, setError] = useState('');
 
   const navigate = useNavigate();
-  const login = useAuthStore((state) => state.login);
+  const { login, signInWithGoogle, isLoading: authLoading } = useAuthStore();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,6 +30,16 @@ const LoginPage: React.FC = () => {
       setError(err instanceof Error ? err.message : 'Une erreur est survenue lors de la connexion');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setError('');
+    try {
+      await signInWithGoogle();
+      // Note: Navigation will be handled by the OAuth redirect
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Une erreur est survenue lors de la connexion avec Google');
     }
   };
 
@@ -61,10 +71,12 @@ const LoginPage: React.FC = () => {
             <Button
               type="button"
               variant="outline"
-              className="w-full flex items-center justify-center px-4 py-3 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-700 hover:bg-gray-50 transition-colors"
+              onClick={handleGoogleSignIn}
+              disabled={authLoading || isLoading}
+              className="w-full flex items-center justify-center px-4 py-3 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Chrome className="h-5 w-5 mr-3 text-red-500" />
-              Continuer avec Google
+              {authLoading ? 'Connexion...' : 'Continuer avec Google'}
             </Button>
             <Button
               type="button"

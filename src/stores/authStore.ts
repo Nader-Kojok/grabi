@@ -8,6 +8,7 @@ interface AuthState {
   user: User | null;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
   register: (userData: {
     firstName: string;
     lastName: string;
@@ -124,6 +125,32 @@ export const useAuthStore = create<AuthState>()(
           }
         } catch (error) {
           console.error('Login error:', error);
+          set({ isLoading: false });
+          throw error as AuthError;
+        }
+      },
+
+      signInWithGoogle: async () => {
+        console.log('Google OAuth sign-in attempt started');
+        set({ isLoading: true });
+        try {
+          const { data, error } = await supabase.auth.signInWithOAuth({
+            provider: 'google',
+            options: {
+              redirectTo: `${window.location.origin}/`
+            }
+          });
+
+          if (error) {
+            console.error('Google OAuth error:', error);
+            throw error;
+          }
+
+          console.log('Google OAuth initiated:', data);
+          // Note: The actual user data will be handled by the session listener
+          // when the user returns from Google OAuth
+        } catch (error) {
+          console.error('Google sign-in error:', error);
           set({ isLoading: false });
           throw error as AuthError;
         }

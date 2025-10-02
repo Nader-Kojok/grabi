@@ -24,7 +24,7 @@ const RegisterPage: React.FC = () => {
   });
 
   const navigate = useNavigate();
-  const register = useAuthStore((state) => state.register);
+  const { register, signInWithGoogle, isLoading: authLoading } = useAuthStore();
 
   const [passwordStrength, setPasswordStrength] = useState<{
     score: number;
@@ -121,6 +121,16 @@ const RegisterPage: React.FC = () => {
     }
   };
 
+  const handleGoogleSignIn = async () => {
+    setError('');
+    try {
+      await signInWithGoogle();
+      // Note: Navigation will be handled by the OAuth redirect
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Une erreur est survenue lors de l\'inscription avec Google');
+    }
+  };
+
   const getPasswordStrengthColor = () => {
     if (passwordStrength.score <= 2) return 'bg-red-500';
     if (passwordStrength.score <= 3) return 'bg-yellow-500';
@@ -163,10 +173,12 @@ const RegisterPage: React.FC = () => {
             <Button
               type="button"
               variant="outline"
-              className="w-full flex items-center justify-center px-4 py-3 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-700 hover:bg-gray-50 transition-colors"
+              onClick={handleGoogleSignIn}
+              disabled={authLoading || isLoading}
+              className="w-full flex items-center justify-center px-4 py-3 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Chrome className="h-5 w-5 mr-3 text-red-500" />
-              S'inscrire avec Google
+              {authLoading ? 'Inscription...' : 'S\'inscrire avec Google'}
             </Button>
             <Button
               type="button"
