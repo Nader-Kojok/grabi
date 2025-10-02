@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, User, Phone, Facebook, Chrome, Check, X } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import { useAuthStore } from '../stores/authStore';
 
 const RegisterPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -19,6 +22,9 @@ const RegisterPage: React.FC = () => {
     acceptTerms: false,
     newsletter: false
   });
+
+  const navigate = useNavigate();
+  const register = useAuthStore((state) => state.register);
 
   const [passwordStrength, setPasswordStrength] = useState<{
     score: number;
@@ -80,18 +86,39 @@ const RegisterPage: React.FC = () => {
     setPasswordStrength({ score, feedback });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
+    
     if (formData.password !== formData.confirmPassword) {
-      alert('Les mots de passe ne correspondent pas');
+      setError('Les mots de passe ne correspondent pas');
       return;
     }
     if (!formData.acceptTerms) {
-      alert('Vous devez accepter les conditions d\'utilisation');
+      setError('Vous devez accepter les conditions d\'utilisation');
       return;
     }
-    // Handle registration logic here
-    console.log('Registration attempt:', formData);
+    if (passwordStrength.score < 3) {
+      setError('Le mot de passe doit être plus fort');
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      await register({
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        password: formData.password,
+        phone: formData.phone
+      });
+      navigate('/'); // Redirect to home page after successful registration
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Une erreur est survenue lors de l\'inscription');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const getPasswordStrengthColor = () => {
@@ -394,13 +421,21 @@ const RegisterPage: React.FC = () => {
               </div>
             </div>
 
+            {/* Error Message */}
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                {error}
+              </div>
+            )}
+
             {/* Submit Button */}
             <div>
               <Button
                 type="submit"
-                className="w-full bg-primary text-primary-foreground hover:bg-primary/90 transition-colors flex justify-center py-3 px-4 rounded-lg shadow-sm text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                disabled={isLoading}
+                className="w-full bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex justify-center py-3 px-4 rounded-lg shadow-sm text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
               >
-                Créer mon compte
+                {isLoading ? 'Création du compte...' : 'Créer mon compte'}
               </Button>
             </div>
           </form>

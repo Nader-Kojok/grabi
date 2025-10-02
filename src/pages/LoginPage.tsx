@@ -1,21 +1,36 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, Facebook, Chrome } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import { useAuthStore } from '../stores/authStore';
 
 const LoginPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const navigate = useNavigate();
+  const login = useAuthStore((state) => state.login);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle login logic here
-    console.log('Login attempt:', { email, password, rememberMe });
+    setIsLoading(true);
+    setError('');
+
+    try {
+      await login(email, password);
+      navigate('/'); // Redirect to home page after successful login
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Une erreur est survenue lors de la connexion');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -153,13 +168,21 @@ const LoginPage: React.FC = () => {
               </div>
             </div>
 
+            {/* Error Message */}
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                {error}
+              </div>
+            )}
+
             {/* Submit Button */}
             <div>
               <Button
                 type="submit"
-                className="w-full bg-primary text-primary-foreground hover:bg-primary/90 transition-colors flex justify-center py-3 px-4 rounded-lg shadow-sm text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                disabled={isLoading}
+                className="w-full bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex justify-center py-3 px-4 rounded-lg shadow-sm text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
               >
-                Se connecter
+                {isLoading ? 'Connexion...' : 'Se connecter'}
               </Button>
             </div>
           </form>

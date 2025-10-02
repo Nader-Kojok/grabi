@@ -1,8 +1,9 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Search, Menu, Plus, User, ChevronLeft, ChevronRight, Car, Home, Smartphone, Shirt, Wrench, Briefcase, MapPin, Baby, Hammer, Package } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Search, Menu, Plus, User, ChevronLeft, ChevronRight, Car, Home, Smartphone, Shirt, Wrench, Briefcase, MapPin, Baby, Hammer, Package, Settings, LogOut, UserCircle, ChevronDown } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
+import { useAuthStore } from '../stores/authStore';
 
 interface Category {
   id: string;
@@ -18,10 +19,29 @@ const Header: React.FC = () => {
   const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
   const [showMegaMenu, setShowMegaMenu] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
-  const [hoverTimeout, setHoverTimeout] = useState<number | null>(null);
-  const [exitTimeout, setExitTimeout] = useState<number | null>(null);
+  const [showUserDropdown, setShowUserDropdown] = useState(false);
+  const [hoverTimeout, setHoverTimeout] = useState<NodeJS.Timeout | null>(null);
+  const [exitTimeout, setExitTimeout] = useState<NodeJS.Timeout | null>(null);
+  
+  const navigate = useNavigate();
+  const { user, logout } = useAuthStore();
 
-  // Helper function to get category description
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (showUserDropdown) {
+        const target = event.target as Element;
+        if (!target.closest('.relative')) {
+          setShowUserDropdown(false);
+        }
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showUserDropdown]);
   const getCategoryDescription = (categoryName: string): string => {
     const descriptions: { [key: string]: string } = {
       'Véhicules': 'Voitures, motos, bateaux et plus',
@@ -264,12 +284,75 @@ const Header: React.FC = () => {
                   <Plus className="h-4 w-4 mr-1" />
                   <span className="hidden lg:inline">Publier</span>
                 </Button>
-                <Link to="/login">
-                  <Button variant="ghost" className="text-gray-600 hover:text-gray-800 font-normal">
-                    <User className="h-4 w-4 mr-1" />
-                    <span className="hidden lg:inline">Connexion</span>
-                  </Button>
-                </Link>
+                
+                {/* User Profile or Login */}
+                {user ? (
+                  <div className="relative">
+                    <Button 
+                      variant="ghost" 
+                      className="text-gray-600 hover:text-gray-800 font-normal flex items-center space-x-2"
+                      onClick={() => setShowUserDropdown(!showUserDropdown)}
+                    >
+                      {user.avatar ? (
+                        <img 
+                          src={user.avatar} 
+                          alt={user.name || 'User'} 
+                          className="h-6 w-6 rounded-full object-cover"
+                        />
+                      ) : (
+                        <UserCircle className="h-6 w-6" />
+                      )}
+                      <span className="hidden lg:inline">{user.name || 'Mon compte'}</span>
+                      <ChevronDown className="h-4 w-4" />
+                    </Button>
+                    
+                    {/* User Dropdown */}
+                    {showUserDropdown && (
+                      <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-50">
+                        <div className="py-1">
+                          <div className="px-4 py-2 border-b border-gray-100">
+                            <p className="text-sm font-medium text-gray-900">{user.name}</p>
+                            <p className="text-xs text-gray-500">{user.email}</p>
+                          </div>
+                          <Link
+                            to="/profile"
+                            className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                            onClick={() => setShowUserDropdown(false)}
+                          >
+                            <UserCircle className="h-4 w-4 mr-3" />
+                            Mon profil
+                          </Link>
+                          <Link
+                            to="/settings"
+                            className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                            onClick={() => setShowUserDropdown(false)}
+                          >
+                            <Settings className="h-4 w-4 mr-3" />
+                            Paramètres
+                          </Link>
+                          <button
+                            onClick={() => {
+                              logout();
+                              setShowUserDropdown(false);
+                              navigate('/');
+                            }}
+                            className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          >
+                            <LogOut className="h-4 w-4 mr-3" />
+                            Déconnexion
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <Link to="/login">
+                    <Button variant="ghost" className="text-gray-600 hover:text-gray-800 font-normal">
+                      <User className="h-4 w-4 mr-1" />
+                      <span className="hidden lg:inline">Connexion</span>
+                    </Button>
+                  </Link>
+                )}
               </div>
               
               {/* Mobile Menu Button */}
@@ -330,14 +413,67 @@ const Header: React.FC = () => {
                 <span className="text-gray-800 font-medium">Publier</span>
               </Link>
               
-              <Link 
-                to="/login" 
-                className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
-                onClick={() => setShowMobileMenu(false)}
-              >
-                <User className="h-5 w-5 text-gray-600" />
-                <span className="text-gray-800 font-medium">Connexion</span>
-              </Link>
+              {/* Mobile User Actions */}
+              {user ? (
+                <>
+                  <div className="border-t border-gray-200 pt-4">
+                    <div className="flex items-center space-x-3 p-3">
+                      {user.avatar ? (
+                        <img 
+                          src={user.avatar} 
+                          alt={user.name || 'User'} 
+                          className="h-8 w-8 rounded-full object-cover"
+                        />
+                      ) : (
+                        <UserCircle className="h-8 w-8 text-gray-600" />
+                      )}
+                      <div>
+                        <p className="text-sm font-medium text-gray-900">{user.name}</p>
+                        <p className="text-xs text-gray-500">{user.email}</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <Link 
+                    to="/profile" 
+                    className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                    onClick={() => setShowMobileMenu(false)}
+                  >
+                    <UserCircle className="h-5 w-5 text-gray-600" />
+                    <span className="text-gray-800 font-medium">Mon profil</span>
+                  </Link>
+                  
+                  <Link 
+                    to="/settings" 
+                    className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                    onClick={() => setShowMobileMenu(false)}
+                  >
+                    <Settings className="h-5 w-5 text-gray-600" />
+                    <span className="text-gray-800 font-medium">Paramètres</span>
+                  </Link>
+                  
+                  <button 
+                    onClick={() => {
+                      logout();
+                      setShowMobileMenu(false);
+                      navigate('/');
+                    }}
+                    className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors w-full text-left"
+                  >
+                    <LogOut className="h-5 w-5 text-gray-600" />
+                    <span className="text-gray-800 font-medium">Déconnexion</span>
+                  </button>
+                </>
+              ) : (
+                <Link 
+                  to="/login" 
+                  className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                  onClick={() => setShowMobileMenu(false)}
+                >
+                  <User className="h-5 w-5 text-gray-600" />
+                  <span className="text-gray-800 font-medium">Connexion</span>
+                </Link>
+              )}
               
               <div className="border-t border-gray-200 pt-4">
                 <Link 

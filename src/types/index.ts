@@ -3,7 +3,16 @@ export interface User {
   name: string;
   email: string;
   avatar?: string;
-  isAuthenticated: boolean;
+  phone?: string;
+  bio?: string;
+  location?: string;
+  dateOfBirth?: string;
+  website?: string;
+  socialLinks?: Record<string, string>;
+  bannerUrl?: string;
+  isVerified?: boolean;
+  verificationBadges?: string[];
+  profileCompletionPercentage?: number;
 }
 
 export interface SearchQuery {
