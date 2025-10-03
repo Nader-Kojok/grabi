@@ -58,6 +58,8 @@ const PaymentErrorPage: React.FC = () => {
       }
 
       // Get the checkout session from our database
+      console.log('Looking for checkout session with:', { sessionId, userId: user.id });
+      
       const { data: checkoutSession, error: dbError } = await (supabase as any)
         .from('checkout_sessions')
         .select('*')
@@ -65,10 +67,13 @@ const PaymentErrorPage: React.FC = () => {
         .eq('user_id', user.id)
         .single();
 
+      console.log('Database query result:', { checkoutSession, dbError });
+
       if (dbError || !checkoutSession) {
+        console.error('Session lookup failed:', { dbError, sessionId, userId: user.id });
         setErrorDetails({
           title: 'Session introuvable',
-          message: 'La session de paiement n\'a pas été trouvée dans notre système.',
+          message: `La session de paiement n'a pas été trouvée dans notre système. Session ID: ${sessionId}`,
           canRetry: false,
         });
         setIsLoading(false);

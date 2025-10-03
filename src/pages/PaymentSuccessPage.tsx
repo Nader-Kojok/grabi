@@ -41,6 +41,8 @@ const PaymentSuccessPage: React.FC = () => {
       }
 
       // 1. Get the checkout session from our database
+      console.log('Looking for checkout session with:', { sessionId, userId: user.id });
+      
       const { data: checkoutSession, error: dbError } = await (supabase as any)
         .from('checkout_sessions')
         .select('*')
@@ -48,8 +50,22 @@ const PaymentSuccessPage: React.FC = () => {
         .eq('user_id', user.id)
         .single();
 
-      if (dbError || !checkoutSession) {
-        throw new Error('Session de paiement introuvable');
+      console.log('Database query result:', { checkoutSession, dbError });
+
+      if (dbError) {
+        console.error('Database error:', dbError);
+        throw new Error(`Erreur base de données: ${dbError.message}`);
+      }
+
+      if (!checkoutSession) {
+        // Try to find any session with this wave_session_id (without user filter)
+        const { data: anySession } = await (supabase as any)
+          .from('checkout_sessions')
+          .select('*')
+          .eq('wave_session_id', sessionId);
+        
+        console.log('Any session found:', anySession);
+        throw new Error('Session de paiement introuvable pour cet utilisateur');
       }
 
       // 2. Verify payment status with Wave API
