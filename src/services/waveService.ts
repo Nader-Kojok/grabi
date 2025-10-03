@@ -35,11 +35,16 @@ interface WaveApiResponse<T> {
 }
 
 class WaveService {
-  private readonly baseUrl: string;
+  private readonly supabaseUrl: string;
+  private readonly supabaseAnonKey: string;
 
   constructor() {
-    // Use the Vite proxy for development, direct API for production
-    this.baseUrl = import.meta.env.DEV ? '/api/wave' : 'https://api.wave.com';
+    this.supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    this.supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+    
+    if (!this.supabaseUrl || !this.supabaseAnonKey) {
+      throw new Error('Supabase configuration is not complete');
+    }
   }
 
   /**
@@ -49,10 +54,11 @@ class WaveService {
     try {
       console.log('Creating Wave checkout session with params:', params);
       
-      const response = await fetch(`${this.baseUrl}/v1/checkout/sessions`, {
+      const response = await fetch(`${this.supabaseUrl}/functions/v1/wave-checkout/create`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${this.supabaseAnonKey}`,
         },
         body: JSON.stringify(params),
       });
@@ -60,29 +66,15 @@ class WaveService {
       console.log('Wave API response status:', response.status);
       
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Wave API error response:', errorText);
-        
-        let errorData;
-        try {
-          errorData = JSON.parse(errorText);
-        } catch {
-          errorData = { message: errorText };
-        }
-        
+        const errorData = await response.json().catch(() => ({}));
         return {
           success: false,
-          error: errorData.message || `HTTP ${response.status}: ${response.statusText}`,
+          error: errorData.error || `HTTP ${response.status}: ${response.statusText}`,
         };
       }
 
-      const data = await response.json();
-      console.log('Wave checkout session created successfully:', data.id);
-      
-      return {
-        success: true,
-        data,
-      };
+      const result = await response.json();
+      return result;
     } catch (error) {
       console.error('Error creating Wave checkout session:', error);
       return {
@@ -97,10 +89,11 @@ class WaveService {
    */
   async getCheckoutSession(sessionId: string): Promise<WaveApiResponse<WaveCheckoutSession>> {
     try {
-      const response = await fetch(`${this.baseUrl}/v1/checkout/sessions/${sessionId}`, {
+      const response = await fetch(`${this.supabaseUrl}/functions/v1/wave-checkout/get/${sessionId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${this.supabaseAnonKey}`,
         },
       });
 
@@ -108,15 +101,12 @@ class WaveService {
         const errorData = await response.json().catch(() => ({}));
         return {
           success: false,
-          error: errorData.message || `HTTP ${response.status}: ${response.statusText}`,
+          error: errorData.error || `HTTP ${response.status}: ${response.statusText}`,
         };
       }
 
-      const data = await response.json();
-      return {
-        success: true,
-        data,
-      };
+      const result = await response.json();
+      return result;
     } catch (error) {
       console.error('Error retrieving Wave checkout session:', error);
       return {
