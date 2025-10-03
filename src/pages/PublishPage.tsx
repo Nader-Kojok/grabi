@@ -225,25 +225,34 @@ const PublishPage: React.FC = () => {
       const expiresAt = new Date();
       expiresAt.setMinutes(expiresAt.getMinutes() + 30); // 30 minutes expiry
 
-      const { error: dbError } = await (supabase as any)
+      const checkoutSessionData = {
+        wave_session_id: waveSession.id,
+        user_id: user!.id,
+        amount: listingPrice,
+        currency: 'XOF',
+        wave_launch_url: waveSession.wave_launch_url,
+        success_url: waveSession.success_url,
+        error_url: waveSession.error_url,
+        client_reference: waveSession.client_reference,
+        listing_data: listingData,
+        when_expires: expiresAt.toISOString()
+      };
+
+      console.log('Saving checkout session to database:', checkoutSessionData);
+
+      const { data: insertedData, error: dbError } = await (supabase as any)
         .from('checkout_sessions')
-        .insert({
-          wave_session_id: waveSession.id,
-          user_id: user!.id,
-          amount: listingPrice,
-          currency: 'XOF',
-          wave_launch_url: waveSession.wave_launch_url,
-          success_url: waveSession.success_url,
-          error_url: waveSession.error_url,
-          client_reference: waveSession.client_reference,
-          listing_data: listingData,
-          when_expires: expiresAt.toISOString()
-        });
+        .insert(checkoutSessionData)
+        .select();
+
+      console.log('Database insert result:', { insertedData, dbError });
 
       if (dbError) {
         console.error('Database error:', dbError);
         throw new Error('Erreur lors de la sauvegarde de la session');
       }
+
+      console.log('Checkout session saved successfully:', insertedData);
 
       // Redirect to Wave payment
       window.location.href = waveSession.wave_launch_url;
