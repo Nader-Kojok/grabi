@@ -35,13 +35,15 @@ interface WaveApiResponse<T> {
 }
 
 class WaveService {
-  private readonly supabaseUrl: string;
+  private readonly apiKey: string;
+  private readonly baseUrl: string;
 
   constructor() {
-    this.supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    this.apiKey = import.meta.env.VITE_WAVE_API_KEY;
+    this.baseUrl = import.meta.env.VITE_WAVE_BASE_URL;
 
-    if (!this.supabaseUrl) {
-      throw new Error('Supabase URL is not configured');
+    if (!this.apiKey) {
+      throw new Error('Wave API key is not configured');
     }
   }
 
@@ -50,24 +52,43 @@ class WaveService {
    */
   async createCheckoutSession(params: CreateCheckoutSessionParams): Promise<WaveApiResponse<WaveCheckoutSession>> {
     try {
-      const response = await fetch(`${this.supabaseUrl}/functions/v1/wave-payment/create-session`, {
+      console.log('Creating Wave checkout session with params:', params);
+      
+      const response = await fetch(`${this.baseUrl}/v1/checkout/sessions`, {
         method: 'POST',
         headers: {
+          'Authorization': `Bearer ${this.apiKey}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(params),
       });
 
+      console.log('Wave API response status:', response.status);
+      
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
+        const errorText = await response.text();
+        console.error('Wave API error response:', errorText);
+        
+        let errorData;
+        try {
+          errorData = JSON.parse(errorText);
+        } catch {
+          errorData = { message: errorText };
+        }
+        
         return {
           success: false,
-          error: errorData.error || `HTTP ${response.status}: ${response.statusText}`,
+          error: errorData.message || `HTTP ${response.status}: ${response.statusText}`,
         };
       }
 
-      const result = await response.json();
-      return result;
+      const data = await response.json();
+      console.log('Wave checkout session created successfully:', data.id);
+      
+      return {
+        success: true,
+        data,
+      };
     } catch (error) {
       console.error('Error creating Wave checkout session:', error);
       return {
@@ -82,9 +103,10 @@ class WaveService {
    */
   async getCheckoutSession(sessionId: string): Promise<WaveApiResponse<WaveCheckoutSession>> {
     try {
-      const response = await fetch(`${this.supabaseUrl}/functions/v1/wave-payment/session/${sessionId}`, {
+      const response = await fetch(`${this.baseUrl}/v1/checkout/sessions/${sessionId}`, {
         method: 'GET',
         headers: {
+          'Authorization': `Bearer ${this.apiKey}`,
           'Content-Type': 'application/json',
         },
       });
@@ -93,12 +115,15 @@ class WaveService {
         const errorData = await response.json().catch(() => ({}));
         return {
           success: false,
-          error: errorData.error || `HTTP ${response.status}: ${response.statusText}`,
+          error: errorData.message || `HTTP ${response.status}: ${response.statusText}`,
         };
       }
 
-      const result = await response.json();
-      return result;
+      const data = await response.json();
+      return {
+        success: true,
+        data,
+      };
     } catch (error) {
       console.error('Error retrieving Wave checkout session:', error);
       return {
