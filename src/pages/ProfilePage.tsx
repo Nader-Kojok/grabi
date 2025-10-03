@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { ArrowLeft, Edit, Save, X, UserCircle, Phone, MapPin, Calendar, Mail, Settings, Shield, Bell, CreditCard, Activity, Link as LinkIcon, Plus } from 'lucide-react';
+import { ArrowLeft, Edit, Save, X, UserCircle, Phone, MapPin, Calendar, Mail, Settings, Shield, Bell, CreditCard, Activity, Link as LinkIcon, Plus, Star } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { FileUpload } from '../components/ui/file-upload';
@@ -8,6 +8,8 @@ import { SocialLinksManager } from '../components/ui/social-links-manager';
 import { ProfileCompletionIndicator } from '../components/ui/profile-completion-indicator';
 import { VerificationBadges } from '../components/ui/verification-badges';
 import { ProfileShareButton } from '../components/ui/profile-share-button';
+import RatingSummary from '../components/RatingSummary';
+import ReviewList from '../components/ReviewList';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { useAuthStore } from '../stores/authStore';
@@ -19,6 +21,7 @@ const ProfilePage: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [activeTab, setActiveTab] = useState<'profile' | 'reviews'>('profile');
   
   const [formData, setFormData] = useState({
     firstName: '',
@@ -246,6 +249,11 @@ const ProfilePage: React.FC = () => {
                       <h1 className="text-3xl font-bold text-white drop-shadow-lg">{user.name}</h1>
                       <VerificationBadges user={user} size="lg" />
                     </div>
+                    {user.sellerRating !== undefined && (
+                      <div className="flex items-center gap-2 mt-1">
+                        <RatingSummary user={user} size="md" className="text-white" />
+                      </div>
+                    )}
                   </div>
                   <p className="text-white/90 flex items-center gap-2 mb-3 drop-shadow-md">
                     <Mail className="h-4 w-4" />
@@ -306,10 +314,35 @@ const ProfilePage: React.FC = () => {
           )}
         </div>
 
+        {/* Tab Navigation */}
+        <div className="mb-6 border-b border-gray-200">
+          <div className="flex space-x-8">
+            <button
+              onClick={() => setActiveTab('profile')}
+              className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'profile' 
+                ? 'border-red-500 text-red-600' 
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
+            >
+              <UserCircle className="inline-block h-5 w-5 mr-2" />
+              Profil
+            </button>
+            <button
+              onClick={() => setActiveTab('reviews')}
+              className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'reviews' 
+                ? 'border-red-500 text-red-600' 
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
+            >
+              <Star className="inline-block h-5 w-5 mr-2" />
+              Évaluations reçues {user.reviewCount ? `(${user.reviewCount})` : ''}
+            </button>
+          </div>
+        </div>
+        
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Personal Information Card */}
+          {/* Tab Content */}
           <div className="lg:col-span-2">
+            {activeTab === 'profile' ? (
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
               <div className="flex items-center gap-3 mb-8">
                 <div className="p-2 bg-red-50 rounded-lg">
@@ -472,6 +505,25 @@ const ProfilePage: React.FC = () => {
                  />
               </div>
             </div>
+            ) : (
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+                <div className="flex items-center gap-3 mb-8">
+                  <div className="p-2 bg-yellow-50 rounded-lg">
+                    <Star className="h-5 w-5 text-yellow-600" />
+                  </div>
+                  <h2 className="text-xl font-semibold text-gray-900 text-left">Évaluations reçues</h2>
+                </div>
+                
+                {user.reviewCount === 0 ? (
+                  <div className="text-center py-8 text-gray-500">
+                    <p>Vous n'avez pas encore reçu d'évaluations.</p>
+                    <p className="mt-2">Les évaluations apparaîtront ici lorsque d'autres utilisateurs évalueront votre profil.</p>
+                  </div>
+                ) : (
+                  <ReviewList sellerId={user.id} limit={10} />
+                )}
+              </div>
+            )}
           </div>
 
           {/* Sidebar Cards */}

@@ -69,18 +69,18 @@ if (percentage < 50) {
 /**
  * Generate shareable profile URL
  */
-export const generateProfileShareUrl = (userId: string, userName?: string): string => {
+export const generateProfileShareUrl = (userId: string): string => {
   const baseUrl = window.location.origin;
-  const slug = userName ? userName.toLowerCase().replace(/\s+/g, '-') : userId;
-  return `${baseUrl}/profile/${slug}`;
+  // Always use the user ID for the URL to ensure it works correctly
+  return `${baseUrl}/profile/${userId}`;
 };
 
 /**
  * Copy profile URL to clipboard
  */
-export const copyProfileUrl = async (userId: string, userName?: string): Promise<boolean> => {
+export const copyProfileUrl = async (userId: string): Promise<boolean> => {
   try {
-    const url = generateProfileShareUrl(userId, userName);
+    const url = generateProfileShareUrl(userId);
     await navigator.clipboard.writeText(url);
     return true;
   } catch (error) {
@@ -93,7 +93,7 @@ export const copyProfileUrl = async (userId: string, userName?: string): Promise
  * Share profile via Web Share API or fallback to copy
  */
 export const shareProfile = async (user: User): Promise<boolean> => {
-  const url = generateProfileShareUrl(user.id, user.name);
+  const url = generateProfileShareUrl(user.id);
   const title = `${user.name}'s Profile - Grabi`;
   const text = `Check out ${user.name}'s profile on Grabi marketplace`;
 
@@ -106,13 +106,13 @@ export const shareProfile = async (user: User): Promise<boolean> => {
         url
       });
       return true;
-    } catch (error) {
+    } catch {
       // User cancelled or error occurred, fallback to copy
     }
   }
 
   // Fallback to copying URL
-  return await copyProfileUrl(user.id, user.name);
+  return await copyProfileUrl(user.id);
 };
 
 export const getVerificationBadges = (user: User): Array<{ type: string; label: string; color: string; icon: string }> => {

@@ -26,6 +26,8 @@ export interface Database {
           is_verified: boolean | null
           verification_badges: string[] | null
           profile_completion_percentage: number | null
+          seller_rating: number | null
+          review_count: number | null
           created_at: string
           updated_at: string
         }
@@ -45,6 +47,8 @@ export interface Database {
           is_verified?: boolean | null
           verification_badges?: string[] | null
           profile_completion_percentage?: number | null
+          seller_rating?: number | null
+          review_count?: number | null
           created_at?: string
           updated_at?: string
         }
@@ -64,6 +68,8 @@ export interface Database {
           is_verified?: boolean | null
           verification_badges?: string[] | null
           profile_completion_percentage?: number | null
+          seller_rating?: number | null
+          review_count?: number | null
           created_at?: string
           updated_at?: string
         }
@@ -196,6 +202,49 @@ export interface Database {
           created_at?: string
         }
         Relationships: []
+      }
+      seller_reviews: {
+        Row: {
+          id: string
+          reviewer_id: string
+          seller_id: string
+          rating: number
+          comment: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          reviewer_id: string
+          seller_id: string
+          rating: number
+          comment?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          reviewer_id?: string
+          seller_id?: string
+          rating?: number
+          comment?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seller_reviews_reviewer_id_fkey"
+            columns: ["reviewer_id"]
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "seller_reviews_seller_id_fkey"
+            columns: ["seller_id"]
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
+        ]
       }
       user_favorites: {
         Row: {

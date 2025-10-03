@@ -174,7 +174,7 @@ export const mockFeaturedProducts: Listing[] = [
     id: 'featured-1',
     title: 'Montre Chrono, Oris - Williams F1 Team',
     price: 1950,
-    currency: '€',
+    currency: 'F CFA',
     location: 'Toulouse 31000',
     image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&h=400&fit=crop&crop=center',
     user: {
@@ -190,7 +190,7 @@ export const mockFeaturedProducts: Listing[] = [
     id: 'featured-2',
     title: 'iPhone 15 Pro Max 256GB - État neuf avec garantie',
     price: 1200,
-    currency: '€',
+    currency: 'F CFA',
     location: 'Paris 15ème',
     image: 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=500&h=400&fit=crop&crop=center',
     user: {
@@ -206,7 +206,7 @@ export const mockFeaturedProducts: Listing[] = [
     id: 'featured-3',
     title: 'BMW Série 3 - 2020 - 45000km - Excellent état',
     price: 28500,
-    currency: '€',
+    currency: 'F CFA',
     location: 'Marseille',
     image: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=500&h=400&fit=crop&crop=center',
     user: {
@@ -222,7 +222,7 @@ export const mockFeaturedProducts: Listing[] = [
     id: 'featured-4',
     title: 'MacBook Air M2 - 13" - 512GB SSD',
     price: 1350,
-    currency: '€',
+    currency: 'F CFA',
     location: 'Toulouse',
     image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=500&h=400&fit=crop&crop=center',
     user: {
@@ -238,7 +238,7 @@ export const mockFeaturedProducts: Listing[] = [
     id: 'featured-5',
     title: 'Canapé 3 places - Cuir véritable italien',
     price: 850,
-    currency: '€',
+    currency: 'F CFA',
     location: 'Nantes',
     image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=500&h=400&fit=crop&crop=center',
     user: {
@@ -254,7 +254,7 @@ export const mockFeaturedProducts: Listing[] = [
     id: 'featured-6',
     title: 'Vélo électrique VTC - Autonomie 80km',
     price: 1200,
-    currency: '€',
+    currency: 'F CFA',
     location: 'Bordeaux',
     image: 'https://images.unsplash.com/photo-1571068316344-75bc76f77890?w=500&h=400&fit=crop&crop=center',
     user: {
@@ -273,7 +273,7 @@ export const mockCurrentListings: Listing[] = [
     id: '1',
     title: 'iPhone 15 Pro Max 256GB - État neuf',
     price: 1200,
-    currency: '€',
+    currency: 'F CFA',
     location: 'Paris 15ème',
     image: 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=400&h=300&fit=crop',
     user: {
@@ -289,7 +289,7 @@ export const mockCurrentListings: Listing[] = [
     id: '2',
     title: 'Appartement T3 - 65m² - Balcon',
     price: 450000,
-    currency: '€',
+    currency: 'F CFA',
     location: 'Lyon 6ème',
     image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop',
     user: {
@@ -304,7 +304,7 @@ export const mockCurrentListings: Listing[] = [
     id: '3',
     title: 'BMW Série 3 - 2020 - 45000km',
     price: 28500,
-    currency: '€',
+    currency: 'F CFA',
     location: 'Marseille',
     image: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=400&h=300&fit=crop',
     user: {
@@ -319,7 +319,7 @@ export const mockCurrentListings: Listing[] = [
     id: '4',
     title: 'MacBook Air M2 - 13" - 512GB',
     price: 1350,
-    currency: '€',
+    currency: 'F CFA',
     location: 'Toulouse',
     image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400&h=300&fit=crop',
     user: {
@@ -334,7 +334,7 @@ export const mockCurrentListings: Listing[] = [
     id: '5',
     title: 'Canapé 3 places - Cuir véritable',
     price: 850,
-    currency: '€',
+    currency: 'F CFA',
     location: 'Nantes',
     image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop',
     user: {
@@ -349,7 +349,7 @@ export const mockCurrentListings: Listing[] = [
     id: '6',
     title: 'Vélo électrique - Autonomie 80km',
     price: 1200,
-    currency: '€',
+    currency: 'F CFA',
     location: 'Bordeaux',
     image: 'https://images.unsplash.com/photo-1571068316344-75bc76f77890?w=400&h=300&fit=crop',
     user: {

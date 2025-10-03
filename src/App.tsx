@@ -10,7 +10,9 @@ import AnnouncesPage from './pages/AnnouncesPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ProfilePage from './pages/ProfilePage';
+import PublicProfilePage from './pages/PublicProfilePage';
 import PublishPage from './pages/PublishPage';
+import SettingsPage from './pages/SettingsPage';
 import './App.css';
 
 // Create a client
@@ -37,7 +39,9 @@ function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/profile/:id" element={<PublicProfilePage />} />
             <Route path="/publier" element={<PublishPage />} />
+            <Route path="/settings" element={<SettingsPage />} />
           </Routes>
         </div>
       </Router>

@@ -60,6 +60,8 @@ export const useAuthStore = create<AuthState>()(
                  isVerified: profile.is_verified || false,
                  verificationBadges: profile.verification_badges || [],
                  profileCompletionPercentage: profile.profile_completion_percentage || 0,
+                 sellerRating: profile.seller_rating || undefined,
+                 reviewCount: profile.review_count || 0,
                };
                console.log('Setting user state:', user);
                set({ user, isLoading: false });
@@ -118,6 +120,8 @@ export const useAuthStore = create<AuthState>()(
                 isVerified: profile.is_verified || false,
                 verificationBadges: profile.verification_badges || [],
                 profileCompletionPercentage: profile.profile_completion_percentage || 0,
+                sellerRating: profile.seller_rating || undefined,
+                reviewCount: profile.review_count || 0,
               };
               console.log('Setting user in store:', user);
               set({ user, isLoading: false });

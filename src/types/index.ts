@@ -13,6 +13,8 @@ export interface User {
   isVerified?: boolean;
   verificationBadges?: string[];
   profileCompletionPercentage?: number;
+  sellerRating?: number;
+  reviewCount?: number;
 }
 
 export interface SearchQuery {

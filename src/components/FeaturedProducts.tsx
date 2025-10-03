@@ -1,6 +1,7 @@
 import React from 'react';
 import { ChevronLeft, ChevronRight, Star, Heart } from 'lucide-react';
 import { mockFeaturedProducts } from '../data/mockData';
+import { formatCurrency } from '../utils/currency';
 
 const FeaturedProducts: React.FC = () => {
   const featuredProducts = mockFeaturedProducts.slice(0, 4); // Afficher seulement les 4 premiers
@@ -78,7 +79,7 @@ const FeaturedProducts: React.FC = () => {
                   
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xl font-bold text-gray-900">
-                      {product.price.toLocaleString()} {product.currency}
+                      {formatCurrency(product.price)}
                     </span>
                   </div>
 
@@ -97,9 +98,14 @@ const FeaturedProducts: React.FC = () => {
                     <div className="flex items-center">
                       <Star className="h-4 w-4 text-yellow-400 fill-current mr-1" />
                       <span className="text-sm text-gray-600">
-                        {product.user.name === 'velge' ? '4.8' : 
-                         product.user.name === 'Marie D.' ? '4.9' : 
-                         product.user.name === 'Sophie L.' ? '4.7' : '4.6'}
+                        {(() => {
+                          switch (product.user.name) {
+                            case 'velge': return '4.8';
+                            case 'Marie D.': return '4.9';
+                            case 'Sophie L.': return '4.7';
+                            default: return '4.6';
+                          }
+                        })()}
                       </span>
                     </div>
                   </div>
