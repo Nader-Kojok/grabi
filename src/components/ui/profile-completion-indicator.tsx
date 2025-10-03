@@ -52,14 +52,14 @@ export const ProfileCompletionIndicator: React.FC<ProfileCompletionIndicatorProp
         />
       </div>
 
-      <p className="text-sm text-gray-600 mb-3">{message}</p>
+      <p className="text-sm text-gray-600 mb-3 text-left">{message}</p>
 
       {missingFields.length > 0 && (
         <div className="space-y-2">
-          <p className="text-sm font-medium text-gray-700">Champs manquants :</p>
+          <p className="text-sm font-medium text-gray-700 text-left">Champs manquants :</p>
           <ul className="space-y-1">
             {missingFields.map((field, index) => (
-              <li key={index} className="text-sm text-gray-600 flex items-center">
+              <li key={index} className="text-sm text-gray-600 flex items-center text-left">
                 <span className="w-1.5 h-1.5 bg-gray-400 rounded-full mr-2" />
                 {field}
               </li>

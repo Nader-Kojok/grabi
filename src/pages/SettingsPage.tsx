@@ -666,12 +666,12 @@ const SettingsPage: React.FC = () => {
               
               <div className="space-y-4">
                 <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                  <p className="text-sm text-gray-600 mb-1">Email</p>
-                  <p className="font-medium text-gray-900">{user.email}</p>
+                  <p className="text-sm text-gray-600 mb-1 text-left">Email</p>
+                  <p className="font-medium text-gray-900 text-left">{user.email}</p>
                 </div>
                 <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                  <p className="text-sm text-gray-600 mb-1">Membre depuis</p>
-                  <p className="font-medium text-gray-900">
+                  <p className="text-sm text-gray-600 mb-1 text-left">Membre depuis</p>
+                  <p className="font-medium text-gray-900 text-left">
                     {new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}
                   </p>
                 </div>
@@ -687,7 +687,7 @@ const SettingsPage: React.FC = () => {
                 <h3 className="text-lg font-semibold text-gray-900 text-left">Facturation</h3>
               </div>
               
-              <p className="text-sm text-gray-700 mb-4">
+              <p className="text-sm text-gray-700 mb-4 text-left">
                 Gérez vos méthodes de paiement et consultez votre historique de facturation.
               </p>
               
@@ -705,7 +705,7 @@ const SettingsPage: React.FC = () => {
                 <h3 className="text-lg font-semibold text-gray-900 text-left">Zone dangereuse</h3>
               </div>
               
-              <p className="text-sm text-gray-700 mb-4">
+              <p className="text-sm text-gray-700 mb-4 text-left">
                 La suppression de votre compte est irréversible. Toutes vos données seront définitivement perdues.
               </p>
               

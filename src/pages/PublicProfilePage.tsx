@@ -433,8 +433,8 @@ function PublicProfilePage() {
               
               {seller.bio && (
                 <div className="mb-6">
-                  <h4 className="text-sm font-medium text-gray-700 mb-2">Bio</h4>
-                  <p className="text-gray-600">{seller.bio}</p>
+                  <h4 className="text-sm font-medium text-gray-700 mb-2 text-left">Bio</h4>
+                  <p className="text-gray-600 text-left">{seller.bio}</p>
                 </div>
               )}
               
@@ -458,7 +458,7 @@ function PublicProfilePage() {
                 <div className="py-3 border-t border-gray-100">
                   <div className="flex items-center gap-3">
                     <Mail className="h-4 w-4 text-gray-400" />
-                    <span className="text-gray-600">{seller.email}</span>
+                    <span className="text-gray-600 text-left">{seller.email}</span>
                   </div>
                 </div>
               )}
@@ -467,7 +467,7 @@ function PublicProfilePage() {
                 <div className="py-3 border-t border-gray-100">
                   <div className="flex items-center gap-3">
                     <Phone className="h-4 w-4 text-gray-400" />
-                    <span className="text-gray-600">{seller.phone}</span>
+                    <span className="text-gray-600 text-left">{seller.phone}</span>
                   </div>
                 </div>
               )}
@@ -476,7 +476,7 @@ function PublicProfilePage() {
                 <div className="py-3 border-t border-gray-100">
                   <div className="flex items-center gap-3">
                     <MapPin className="h-4 w-4 text-gray-400" />
-                    <span className="text-gray-600">{seller.location}</span>
+                    <span className="text-gray-600 text-left">{seller.location}</span>
                   </div>
                 </div>
               )}
@@ -484,7 +484,7 @@ function PublicProfilePage() {
               <div className="py-3 border-t border-gray-100">
                 <div className="flex items-center gap-3">
                   <Calendar className="h-4 w-4 text-gray-400" />
-                  <span className="text-gray-600">
+                  <span className="text-gray-600 text-left">
                     Membre depuis {new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}
                   </span>
                 </div>
@@ -492,7 +492,7 @@ function PublicProfilePage() {
               
               {seller.socialLinks && Object.keys(seller.socialLinks).length > 0 && (
                 <div className="pt-4 border-t border-gray-100">
-                  <h4 className="text-sm font-medium text-gray-700 mb-3">Réseaux sociaux</h4>
+                  <h4 className="text-sm font-medium text-gray-700 mb-3 text-left">Réseaux sociaux</h4>
                   <div className="flex flex-wrap gap-3">
                     {Object.entries(seller.socialLinks).map(([platform, url]) => (
                       <a

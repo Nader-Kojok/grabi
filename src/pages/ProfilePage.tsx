@@ -540,7 +540,7 @@ const ProfilePage: React.FC = () => {
                 <h3 className="text-lg font-semibold text-gray-900 text-left">Action rapide</h3>
               </div>
               
-              <p className="text-sm text-gray-700 mb-4">
+              <p className="text-sm text-gray-700 mb-4 text-left">
                 Vous avez quelque chose à vendre ? Publiez votre annonce en quelques clics !
               </p>
               

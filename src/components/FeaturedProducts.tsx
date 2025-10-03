@@ -1,9 +1,11 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Star, Heart } from 'lucide-react';
 import { mockFeaturedProducts } from '../data/mockData';
 import { formatCurrency } from '../utils/currency';
 
 const FeaturedProducts: React.FC = () => {
+  const navigate = useNavigate();
   const featuredProducts = mockFeaturedProducts.slice(0, 4); // Afficher seulement les 4 premiers
 
   const formatTimeAgo = (date: Date) => {
@@ -34,6 +36,16 @@ const FeaturedProducts: React.FC = () => {
             {featuredProducts.map((product) => (
               <div
                 key={product.id}
+                onClick={() => navigate(`/product/${product.id}`)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    navigate(`/product/${product.id}`);
+                  }
+                }}
+                role="button"
+                tabIndex={0}
+                aria-label={`Voir l'annonce: ${product.title}`}
                 className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow cursor-pointer group flex flex-col h-full"
               >
                 {/* Product Image */}
