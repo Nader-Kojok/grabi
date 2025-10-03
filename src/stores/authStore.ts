@@ -62,6 +62,10 @@ export const useAuthStore = create<AuthState>()(
                  profileCompletionPercentage: profile.profile_completion_percentage || 0,
                  sellerRating: profile.seller_rating || undefined,
                  reviewCount: profile.review_count || 0,
+                 isProfilePublic: profile.is_profile_public ?? true,
+                 showEmail: profile.show_email ?? false,
+                 showPhone: profile.show_phone ?? false,
+                 allowReviews: profile.allow_reviews ?? true,
                };
                console.log('Setting user state:', user);
                set({ user, isLoading: false });

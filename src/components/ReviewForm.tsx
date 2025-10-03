@@ -6,16 +6,16 @@ import { supabase } from '../lib/supabase'
 import { useAuthStore } from '../stores/authStore'
 
 interface ReviewFormProps {
-  sellerId: string
-  onReviewSubmitted?: () => void
-  className?: string
+  readonly sellerId: string
+  readonly onReviewSubmitted?: () => void
+  readonly className?: string
 }
 
 function ReviewForm({
   sellerId,
   onReviewSubmitted,
   className = ''
-}: ReviewFormProps) {
+}: Readonly<ReviewFormProps>) {
   const { user } = useAuthStore()
   const [rating, setRating] = useState(0)
   const [hoverRating, setHoverRating] = useState(0)
@@ -131,7 +131,7 @@ function ReviewForm({
 
   if (!user) {
     return (
-      <div className={`p-4 bg-gray-50 rounded-lg border border-gray-200 text-center ${className}`}>
+      <div className={`p-4 bg-gray-50 rounded-lg border border-gray-200 text-left ${className}`}>
         <p className="text-gray-600 mb-2">Connectez-vous pour laisser une évaluation</p>
         <Button 
           onClick={() => window.location.href = '/login'}
@@ -149,16 +149,16 @@ function ReviewForm({
 
   return (
     <div className={`p-6 bg-white rounded-lg border border-gray-200 ${className}`}>
-      <h3 className="text-lg font-semibold mb-4">
+      <h3 className="text-lg font-semibold text-gray-900 mb-4 text-left">
         {existingReview ? 'Modifier votre évaluation' : 'Évaluer ce vendeur'}
       </h3>
       
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="rating" className="block text-sm font-semibold text-gray-900 mb-2 text-left">
             Note
           </label>
-          <div className="flex items-center">
+          <div id="rating" className="flex items-center">
             {[1, 2, 3, 4, 5].map((star) => (
               <button
                 key={star}
@@ -181,13 +181,13 @@ function ReviewForm({
         </div>
         
         <div className="mb-4">
-          <label htmlFor="comment" className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="comment" className="block text-sm font-semibold text-gray-900 mb-2 text-left">
             Commentaire (optionnel)
           </label>
           <Textarea
             id="comment"
             value={comment}
-            onChange={(e) => setComment(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setComment(e.target.value)}
             placeholder="Partagez votre expérience avec ce vendeur..."
             rows={4}
             className="w-full p-3 border border-gray-300 rounded-md focus:ring-red-500 focus:border-red-500"
@@ -211,12 +211,11 @@ function ReviewForm({
           disabled={isSubmitting || rating === 0}
           className="bg-red-600 hover:bg-red-700 w-full"
         >
-          {isSubmitting 
-            ? 'Envoi en cours...' 
-            : existingReview 
-              ? 'Mettre à jour l\'évaluation' 
-              : 'Envoyer l\'évaluation'
-          }
+          {(() => {
+            if (isSubmitting) return 'Envoi en cours...'
+            if (existingReview) return 'Mettre à jour l\'évaluation'
+            return 'Envoyer l\'évaluation'
+          })()}
         </Button>
       </form>
     </div>

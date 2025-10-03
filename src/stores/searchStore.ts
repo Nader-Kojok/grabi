@@ -34,7 +34,7 @@ export const useSearchStore = create<SearchStore>()(
         const newSearch: SearchQuery = {
           id: Date.now().toString(),
           query: trimmedQuery,
-          timestamp: new Date(),
+          resultsCount: 0,
         };
         
         // Keep only the last 10 searches

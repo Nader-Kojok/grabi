@@ -6,7 +6,7 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
-export interface Database {
+export type Database = {
   public: {
     Tables: {
       profiles: {
@@ -28,8 +28,12 @@ export interface Database {
           profile_completion_percentage: number | null
           seller_rating: number | null
           review_count: number | null
-          created_at: string
-          updated_at: string
+          is_profile_public: boolean | null
+          show_email: boolean | null
+          show_phone: boolean | null
+          allow_reviews: boolean | null
+          created_at: string | null
+          updated_at: string | null
         }
         Insert: {
           id: string
@@ -49,8 +53,12 @@ export interface Database {
           profile_completion_percentage?: number | null
           seller_rating?: number | null
           review_count?: number | null
-          created_at?: string
-          updated_at?: string
+          is_profile_public?: boolean | null
+          show_email?: boolean | null
+          show_phone?: boolean | null
+          allow_reviews?: boolean | null
+          created_at?: string | null
+          updated_at?: string | null
         }
         Update: {
           id?: string
@@ -70,8 +78,12 @@ export interface Database {
           profile_completion_percentage?: number | null
           seller_rating?: number | null
           review_count?: number | null
-          created_at?: string
-          updated_at?: string
+          is_profile_public?: boolean | null
+          show_email?: boolean | null
+          show_phone?: boolean | null
+          allow_reviews?: boolean | null
+          created_at?: string | null
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -124,45 +136,48 @@ export interface Database {
           title: string
           description: string | null
           price: number
-          currency: string
+          currency: string | null
           location: string
           images: string[] | null
-          category_id: string
+          category_id: string | null
           user_id: string
-          status: 'active' | 'sold' | 'inactive'
-          featured: boolean
-          created_at: string
-          updated_at: string
+          status: string | null
+          featured: boolean | null
+          views: number | null
+          created_at: string | null
+          updated_at: string | null
         }
         Insert: {
           id?: string
           title: string
           description?: string | null
           price: number
-          currency?: string
+          currency?: string | null
           location: string
           images?: string[] | null
-          category_id: string
+          category_id?: string | null
           user_id: string
-          status?: 'active' | 'sold' | 'inactive'
-          featured?: boolean
-          created_at?: string
-          updated_at?: string
+          status?: string | null
+          featured?: boolean | null
+          views?: number | null
+          created_at?: string | null
+          updated_at?: string | null
         }
         Update: {
           id?: string
           title?: string
           description?: string | null
           price?: number
-          currency?: string
+          currency?: string | null
           location?: string
           images?: string[] | null
-          category_id?: string
+          category_id?: string | null
           user_id?: string
-          status?: 'active' | 'sold' | 'inactive'
-          featured?: boolean
-          created_at?: string
-          updated_at?: string
+          status?: string | null
+          featured?: boolean | null
+          views?: number | null
+          created_at?: string | null
+          updated_at?: string | null
         }
         Relationships: [
           {
@@ -183,25 +198,32 @@ export interface Database {
         Row: {
           id: string
           query: string
-          count: number
-          last_searched: string
-          created_at: string
+          user_id: string | null
+          results_count: number | null
+          created_at: string | null
         }
         Insert: {
           id?: string
           query: string
-          count?: number
-          last_searched?: string
-          created_at?: string
+          user_id?: string | null
+          results_count?: number | null
+          created_at?: string | null
         }
         Update: {
           id?: string
           query?: string
-          count?: number
-          last_searched?: string
-          created_at?: string
+          user_id?: string | null
+          results_count?: number | null
+          created_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "search_queries_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
+        ]
       }
       seller_reviews: {
         Row: {
@@ -210,8 +232,8 @@ export interface Database {
           seller_id: string
           rating: number
           comment: string | null
-          created_at: string
-          updated_at: string
+          created_at: string | null
+          updated_at: string | null
         }
         Insert: {
           id?: string
@@ -219,8 +241,8 @@ export interface Database {
           seller_id: string
           rating: number
           comment?: string | null
-          created_at?: string
-          updated_at?: string
+          created_at?: string | null
+          updated_at?: string | null
         }
         Update: {
           id?: string
@@ -228,8 +250,8 @@ export interface Database {
           seller_id?: string
           rating?: number
           comment?: string | null
-          created_at?: string
-          updated_at?: string
+          created_at?: string | null
+          updated_at?: string | null
         }
         Relationships: [
           {
@@ -248,19 +270,22 @@ export interface Database {
       }
       user_favorites: {
         Row: {
+          id: string
           user_id: string
           listing_id: string
-          created_at: string
+          created_at: string | null
         }
         Insert: {
+          id?: string
           user_id: string
           listing_id: string
-          created_at?: string
+          created_at?: string | null
         }
         Update: {
+          id?: string
           user_id?: string
           listing_id?: string
-          created_at?: string
+          created_at?: string | null
         }
         Relationships: [
           {

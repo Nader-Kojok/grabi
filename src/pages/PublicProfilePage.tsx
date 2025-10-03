@@ -24,11 +24,11 @@ function PublicProfilePage() {
     id: string;
     title: string;
     price: number;
-    currency: string;
+    currency: string | null;
     location: string;
-    images?: string[];
-    created_at: string;
-    category?: { name: string };
+    images?: string[] | null;
+    created_at: string | null;
+    category?: { name: string } | null;
   }>>([])
   const [loadingListings, setLoadingListings] = useState(false)
 
@@ -109,13 +109,7 @@ function PublicProfilePage() {
 
       if (error) throw error
 
-      // Convert null to undefined for images
-      const formattedListings = data?.map(item => ({
-        ...item,
-        images: item.images || undefined
-      })) || []
-
-      setListings(formattedListings)
+      setListings(data || [])
     } catch (err) {
       console.error('Error fetching seller listings:', err)
     } finally {
@@ -322,55 +316,65 @@ function PublicProfilePage() {
                   <h2 className="text-xl font-semibold text-gray-900 text-left">Annonces de {seller.name}</h2>
                 </div>
                 
-                {loadingListings ? (
-                  <div className="animate-pulse space-y-4">
-                    {[...Array(3)].map((_, i) => (
-                      <div key={i} className="h-32 bg-gray-200 rounded-lg"></div>
-                    ))}
-                  </div>
-                ) : listings.length === 0 ? (
-                  <div className="text-center py-8 text-gray-500">
-                    <p>Aucune annonce active pour le moment.</p>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {listings.map(listing => (
-                      <Link 
-                        key={listing.id} 
-                        to={`/listings/${listing.id}`}
-                        className="block border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow"
-                      >
-                        <div className="aspect-video bg-gray-100 relative">
-                          {listing.images && listing.images[0] ? (
-                            <img 
-                              src={listing.images[0]} 
-                              alt={listing.title} 
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center bg-gray-200">
-                              <span className="text-gray-400">Pas d'image</span>
-                            </div>
-                          )}
-                        </div>
-                        <div className="p-4">
-                          <h3 className="font-medium text-gray-900 truncate">{listing.title}</h3>
-                          <div className="flex justify-between items-center mt-2">
-                            <span className="text-red-600 font-bold">
-                              {new Intl.NumberFormat('fr-FR', {
-                                style: 'currency',
-                                currency: listing.currency || 'XOF',
-                                minimumFractionDigits: 0,
-                                maximumFractionDigits: 0
-                              }).format(listing.price)}
-                            </span>
-                            <span className="text-sm text-gray-500">{listing.location}</span>
+                {(() => {
+                  if (loadingListings) {
+                    return (
+                      <div className="animate-pulse space-y-4">
+                        {[...Array(3)].map((_, i) => (
+                          <div key={`skeleton-${i}`} className="h-32 bg-gray-200 rounded-lg"></div>
+                        ))}
+                      </div>
+                    )
+                  }
+                  
+                  if (listings.length === 0) {
+                    return (
+                      <div className="py-8 text-gray-500 text-left">
+                        <p>Aucune annonce active pour le moment.</p>
+                      </div>
+                    )
+                  }
+                  
+                  return (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {listings.map(listing => (
+                        <Link 
+                          key={listing.id} 
+                          to={`/listings/${listing.id}`}
+                          className="block border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow"
+                        >
+                          <div className="aspect-video bg-gray-100 relative">
+                            {listing.images?.[0] ? (
+                              <img 
+                                src={listing.images[0]} 
+                                alt={listing.title} 
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center bg-gray-200">
+                                <span className="text-gray-400">Pas d'image</span>
+                              </div>
+                            )}
                           </div>
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
-                )}
+                          <div className="p-4">
+                            <h3 className="font-medium text-gray-900 truncate">{listing.title}</h3>
+                            <div className="flex justify-between items-center mt-2">
+                              <span className="text-red-600 font-bold">
+                                {new Intl.NumberFormat('fr-FR', {
+                                  style: 'currency',
+                                  currency: listing.currency || 'XOF',
+                                  minimumFractionDigits: 0,
+                                  maximumFractionDigits: 0
+                                }).format(listing.price)}
+                              </span>
+                              <span className="text-sm text-gray-500">{listing.location}</span>
+                            </div>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  )
+                })()}
               </div>
             ) : (
               <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">

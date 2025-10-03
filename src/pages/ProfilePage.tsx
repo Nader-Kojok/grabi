@@ -515,7 +515,7 @@ const ProfilePage: React.FC = () => {
                 </div>
                 
                 {user.reviewCount === 0 ? (
-                  <div className="text-center py-8 text-gray-500">
+                  <div className="py-8 text-gray-500 text-left">
                     <p>Vous n'avez pas encore reçu d'évaluations.</p>
                     <p className="mt-2">Les évaluations apparaîtront ici lorsque d'autres utilisateurs évalueront votre profil.</p>
                   </div>

@@ -57,6 +57,14 @@ const SettingsPage: React.FC = () => {
     currency: 'EUR'
   });
 
+  // Privacy Settings
+  const [privacySettings, setPrivacySettings] = useState({
+    isProfilePublic: user?.isProfilePublic ?? true,
+    showEmail: user?.showEmail ?? false,
+    showPhone: user?.showPhone ?? false,
+    allowReviews: user?.allowReviews ?? true
+  });
+
   useEffect(() => {
     // Load user preferences from localStorage or API
     const savedPreferences = localStorage.getItem('userPreferences');
@@ -105,6 +113,22 @@ const SettingsPage: React.FC = () => {
   const handlePreferencesSave = () => {
     localStorage.setItem('userPreferences', JSON.stringify(preferences));
     setMessage({ type: 'success', text: 'Préférences enregistrées!' });
+  };
+
+  const handlePrivacySave = async () => {
+    setIsLoading(true);
+    setMessage(null);
+
+    try {
+      // TODO: Implement privacy settings update with Supabase
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
+      setMessage({ type: 'success', text: 'Paramètres de confidentialité enregistrés!' });
+    } catch (error) {
+      console.error('Error updating privacy settings:', error);
+      setMessage({ type: 'error', text: 'Erreur lors de la sauvegarde des paramètres' });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleDeleteAccount = async () => {
@@ -209,7 +233,7 @@ const SettingsPage: React.FC = () => {
                   
                   <div className="space-y-4">
                     <div className="space-y-2">
-                      <label htmlFor="currentPassword" className="block text-sm font-semibold text-gray-900">
+                      <label htmlFor="currentPassword" className="block text-sm font-semibold text-gray-900 text-left">
                         Mot de passe actuel
                       </label>
                       <div className="relative">
@@ -232,7 +256,7 @@ const SettingsPage: React.FC = () => {
                     </div>
 
                     <div className="space-y-2">
-                      <label htmlFor="newPassword" className="block text-sm font-semibold text-gray-900">
+                      <label htmlFor="newPassword" className="block text-sm font-semibold text-gray-900 text-left">
                         Nouveau mot de passe
                       </label>
                       <div className="relative">
@@ -255,7 +279,7 @@ const SettingsPage: React.FC = () => {
                     </div>
 
                     <div className="space-y-2">
-                      <label htmlFor="confirmPassword" className="block text-sm font-semibold text-gray-900">
+                      <label htmlFor="confirmPassword" className="block text-sm font-semibold text-gray-900 text-left">
                         Confirmer le nouveau mot de passe
                       </label>
                       <Input
@@ -281,22 +305,93 @@ const SettingsPage: React.FC = () => {
 
                 {/* Privacy Settings */}
                 <div className="pt-6 border-t border-gray-200">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4 text-left">Confidentialité</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4 text-left">Confidentialité du profil</h3>
                   <div className="space-y-4">
                     <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
                       <div className="flex items-center gap-3">
-                        <Eye className="h-5 w-5 text-gray-500" />
+                        <Globe className="h-5 w-5 text-gray-500" />
                         <div>
                           <p className="font-medium text-gray-900">Profil public</p>
-                          <p className="text-sm text-gray-600">Votre profil est visible par tous</p>
+                          <p className="text-sm text-gray-600">Permettre aux autres utilisateurs de voir votre profil</p>
                         </div>
                       </div>
-                      <label className="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" className="sr-only peer" defaultChecked />
+                      <label className="relative inline-flex items-center cursor-pointer" aria-label="Profil public">
+                        <input 
+                          type="checkbox" 
+                          className="sr-only peer" 
+                          checked={privacySettings.isProfilePublic}
+                          onChange={(e) => setPrivacySettings(prev => ({ ...prev, isProfilePublic: e.target.checked }))}
+                        />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-red-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+                      </label>
+                    </div>
+
+                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
+                      <div className="flex items-center gap-3">
+                        <Mail className="h-5 w-5 text-gray-500" />
+                        <div>
+                          <p className="font-medium text-gray-900">Afficher l'email</p>
+                          <p className="text-sm text-gray-600">Permettre aux autres de voir votre adresse email</p>
+                        </div>
+                      </div>
+                      <label className="relative inline-flex items-center cursor-pointer" aria-label="Afficher l'email">
+                        <input 
+                          type="checkbox" 
+                          className="sr-only peer" 
+                          checked={privacySettings.showEmail}
+                          onChange={(e) => setPrivacySettings(prev => ({ ...prev, showEmail: e.target.checked }))}
+                        />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-red-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+                      </label>
+                    </div>
+
+                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
+                      <div className="flex items-center gap-3">
+                        <Smartphone className="h-5 w-5 text-gray-500" />
+                        <div>
+                          <p className="font-medium text-gray-900">Afficher le téléphone</p>
+                          <p className="text-sm text-gray-600">Permettre aux autres de voir votre numéro de téléphone</p>
+                        </div>
+                      </div>
+                      <label className="relative inline-flex items-center cursor-pointer" aria-label="Afficher le téléphone">
+                        <input 
+                          type="checkbox" 
+                          className="sr-only peer" 
+                          checked={privacySettings.showPhone}
+                          onChange={(e) => setPrivacySettings(prev => ({ ...prev, showPhone: e.target.checked }))}
+                        />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-red-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+                      </label>
+                    </div>
+
+                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
+                      <div className="flex items-center gap-3">
+                        <MessageSquare className="h-5 w-5 text-gray-500" />
+                        <div>
+                          <p className="font-medium text-gray-900">Autoriser les évaluations</p>
+                          <p className="text-sm text-gray-600">Permettre aux autres utilisateurs de laisser des avis sur votre profil</p>
+                        </div>
+                      </div>
+                      <label className="relative inline-flex items-center cursor-pointer" aria-label="Autoriser les évaluations">
+                        <input 
+                          type="checkbox" 
+                          className="sr-only peer" 
+                          checked={privacySettings.allowReviews}
+                          onChange={(e) => setPrivacySettings(prev => ({ ...prev, allowReviews: e.target.checked }))}
+                        />
                         <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-red-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
                       </label>
                     </div>
                   </div>
+
+                  <Button
+                    onClick={handlePrivacySave}
+                    disabled={isLoading}
+                    className="mt-6 bg-red-600 hover:bg-red-700 flex items-center gap-2"
+                  >
+                    <Save className="h-4 w-4" />
+                    {isLoading ? 'Enregistrement...' : 'Enregistrer les paramètres'}
+                  </Button>
                 </div>
               </div>
             </div>

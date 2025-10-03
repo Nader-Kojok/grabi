@@ -3,24 +3,27 @@ export interface User {
   name: string;
   email: string;
   avatar?: string;
+  bannerUrl?: string;
   phone?: string;
   bio?: string;
   location?: string;
   dateOfBirth?: string;
   website?: string;
   socialLinks?: Record<string, string>;
-  bannerUrl?: string;
   isVerified?: boolean;
   verificationBadges?: string[];
   profileCompletionPercentage?: number;
   sellerRating?: number;
   reviewCount?: number;
+  isProfilePublic?: boolean;
+  showEmail?: boolean;
+  showPhone?: boolean;
+  allowReviews?: boolean;
 }
 
 export interface SearchQuery {
   id: string;
   query: string;
-  timestamp: Date;
   resultsCount?: number;
 }
 

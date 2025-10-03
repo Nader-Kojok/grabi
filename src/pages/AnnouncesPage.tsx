@@ -306,7 +306,7 @@ const AnnouncesPage: React.FC = () => {
         {/* Results Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-4">
-            <h2 className="text-xl font-semibold text-gray-900">
+            <h2 className="text-xl font-semibold text-gray-900 text-left">
               {sortedListings.length} annonces trouvées
             </h2>
             {searchQuery && (
@@ -358,11 +358,11 @@ const AnnouncesPage: React.FC = () => {
 
         {/* Empty State */}
         {sortedListings.length === 0 && (
-          <div className="text-center py-12">
+          <div className="py-12 text-left">
             <div className="text-gray-400 mb-4">
-              <Search className="h-12 w-12 mx-auto" />
+              <Search className="h-12 w-12" />
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
+            <h3 className="text-lg font-medium text-gray-900 mb-2 text-left">
               Aucune annonce trouvée
             </h3>
             <p className="text-gray-500 mb-4">

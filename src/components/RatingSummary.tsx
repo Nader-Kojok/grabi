@@ -18,7 +18,7 @@ function RatingSummary({
   if (!user.sellerRating) {
     return (
       <div className={`flex items-center ${className}`}>
-        <span className="text-gray-500 text-sm">Aucune évaluation</span>
+        <span className="text-gray-500 text-sm text-left">Aucune évaluation</span>
       </div>
     )
   }

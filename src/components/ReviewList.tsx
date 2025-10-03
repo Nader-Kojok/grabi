@@ -7,7 +7,7 @@ interface Review {
   id: string
   rating: number
   comment: string | null
-  created_at: string
+  created_at: string | null
   reviewer: {
     id: string
     name: string
@@ -155,7 +155,7 @@ function ReviewList({
 
   if (loading && page === 0) {
     return (
-      <div className={`py-8 text-center ${className}`}>
+      <div className={`py-8 text-left ${className}`}>
         <div className="animate-pulse flex flex-col items-center">
           <div className="h-4 bg-gray-200 rounded w-1/4 mb-4"></div>
           <div className="h-20 bg-gray-200 rounded w-full mb-2"></div>
@@ -167,7 +167,7 @@ function ReviewList({
 
   if (error) {
     return (
-      <div className={`py-4 text-center text-red-500 ${className}`}>
+      <div className={`py-4 text-left text-red-500 ${className}`}>
         {error}
       </div>
     )
@@ -175,7 +175,7 @@ function ReviewList({
 
   if (reviews.length === 0) {
     return (
-      <div className={`py-8 text-center text-gray-500 ${className}`}>
+      <div className={`py-8 text-left text-gray-500 ${className}`}>
         Aucune évaluation pour ce vendeur
       </div>
     )
@@ -210,7 +210,7 @@ function ReviewList({
               <div className="flex-1">
                 <div className="flex justify-between items-start">
                   <div>
-                    <h4 className="font-medium text-gray-900">{review.reviewer.name}</h4>
+                    <h4 className="font-semibold text-gray-900 text-left">{review.reviewer.name}</h4>
                     <div className="flex items-center mt-1">
                       {Array.from({ length: 5 }).map((_, i) => (
                         <Star 
@@ -219,7 +219,7 @@ function ReviewList({
                         />
                       ))}
                       <span className="ml-2 text-sm text-gray-500">
-                        {formatDate(review.created_at)}
+                        {review.created_at ? formatDate(review.created_at) : 'Date inconnue'}
                       </span>
                     </div>
                   </div>
@@ -227,7 +227,7 @@ function ReviewList({
                 
                 {review.comment && (
                   <div className="mt-3">
-                    <p className="text-gray-700 whitespace-pre-line">
+                    <p className="text-gray-700 whitespace-pre-line text-left">
                       {displayComment}
                     </p>
                     
