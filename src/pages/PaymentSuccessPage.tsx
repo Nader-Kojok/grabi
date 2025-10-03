@@ -16,7 +16,7 @@ const PaymentSuccessPage: React.FC = () => {
   const [error, setError] = useState('');
   const [listingCreated, setListingCreated] = useState(false);
 
-  const sessionId = searchParams.get('session_id');
+  let sessionId = searchParams.get('session_id');
 
   useEffect(() => {
     if (!user) {
@@ -24,31 +24,59 @@ const PaymentSuccessPage: React.FC = () => {
       return;
     }
 
-    if (!sessionId) {
-      setError('ID de session manquant');
-      setIsProcessing(false);
-      return;
-    }
+    // Note: sessionId might be null, we'll handle this in processPaymentSuccess
 
     processPaymentSuccess();
   }, [user, sessionId, navigate]);
 
   const processPaymentSuccess = async () => {
     try {
-      // Ensure we have valid sessionId and user.id
-      if (!sessionId || !user?.id) {
-        throw new Error('Informations de session ou d\'utilisateur manquantes');
+      // Ensure we have valid user.id
+      if (!user?.id) {
+        throw new Error('Utilisateur non authentifié');
       }
 
       // 1. Get the checkout session from our database
       console.log('Looking for checkout session with:', { sessionId, userId: user.id });
       
-      const { data: checkoutSession, error: dbError } = await (supabase as any)
-        .from('checkout_sessions')
-        .select('*')
-        .eq('wave_session_id', sessionId)
-        .eq('user_id', user.id)
-        .maybeSingle();
+      let checkoutSession = null;
+      let dbError = null;
+
+      if (sessionId) {
+        // Try to find the session with the provided session ID
+        const result = await (supabase as any)
+          .from('checkout_sessions')
+          .select('*')
+          .eq('wave_session_id', sessionId)
+          .eq('user_id', user.id)
+          .maybeSingle();
+        
+        checkoutSession = result.data;
+        dbError = result.error;
+      }
+
+      // If no session found with the provided ID, or no session ID provided,
+      // find the most recent checkout session for this user
+      if (!checkoutSession && !dbError) {
+        console.log('No session found with provided ID, looking for most recent session for user');
+        
+        const result = await (supabase as any)
+          .from('checkout_sessions')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('when_created', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        
+        checkoutSession = result.data;
+        dbError = result.error;
+        
+        if (checkoutSession) {
+          console.log('Found most recent session:', checkoutSession.wave_session_id);
+          // Update sessionId to use the found session
+          sessionId = checkoutSession.wave_session_id;
+        }
+      }
 
       console.log('Database query result:', { checkoutSession, dbError });
 
@@ -58,22 +86,14 @@ const PaymentSuccessPage: React.FC = () => {
       }
 
       if (!checkoutSession) {
-        // Try to find any session with this wave_session_id (without user filter)
-        const { data: anySession } = await (supabase as any)
-          .from('checkout_sessions')
-          .select('*')
-          .eq('wave_session_id', sessionId);
-        
-        console.log('Any session found:', anySession);
-        
-        if (anySession && anySession.length > 0) {
-          throw new Error(`Session trouvée mais appartient à un autre utilisateur. Session user: ${anySession[0].user_id}, Current user: ${user.id}`);
-        } else {
-          throw new Error('Session de paiement introuvable dans la base de données');
-        }
+        throw new Error('Aucune session de paiement trouvée pour cet utilisateur');
       }
 
       // 2. Verify payment status with Wave API
+      if (!sessionId) {
+        throw new Error('Session ID manquant après recherche');
+      }
+      
       const waveResponse = await waveService.getCheckoutSession(sessionId);
       
       if (!waveResponse.success || !waveResponse.data) {

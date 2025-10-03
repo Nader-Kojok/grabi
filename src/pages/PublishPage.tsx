@@ -192,7 +192,6 @@ const PublishPage: React.FC = () => {
     try {
       // Create Wave checkout session for listing publication fee
       const listingPrice = waveService.getListingPrice();
-      const sessionId = `session_${Date.now()}_${user?.id}`;
       
       const listingData: ListingFormData = {
         title: formData.title,
@@ -207,11 +206,12 @@ const PublishPage: React.FC = () => {
       };
 
       // Create Wave checkout session
+      // We'll create the URLs without session_id first, then Wave will handle the redirect
       const waveResponse = await waveService.createCheckoutSession({
         amount: waveService.formatAmount(listingPrice),
         currency: 'XOF',
-        success_url: waveService.generateSuccessUrl(sessionId),
-        error_url: waveService.generateErrorUrl(sessionId),
+        success_url: `${window.location.origin}/payment/success`,
+        error_url: `${window.location.origin}/payment/error`,
         client_reference: `listing_${Date.now()}`
       });
 
@@ -220,6 +220,17 @@ const PublishPage: React.FC = () => {
       }
 
       const waveSession = waveResponse.data;
+
+      // Now update the success/error URLs with the actual Wave session ID
+      // Note: This is a workaround since Wave doesn't automatically append session_id
+      const actualSuccessUrl = `${window.location.origin}/payment/success?session_id=${waveSession.id}`;
+      const actualErrorUrl = `${window.location.origin}/payment/error?session_id=${waveSession.id}`;
+
+      console.log('Wave session created:', {
+        id: waveSession.id,
+        successUrl: actualSuccessUrl,
+        errorUrl: actualErrorUrl
+      });
 
       // Store checkout session in database
       const expiresAt = new Date();
