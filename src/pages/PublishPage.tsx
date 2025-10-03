@@ -7,6 +7,8 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { useAuthStore } from '../stores/authStore';
 import { supabase } from '../lib/supabase';
+import { waveService } from '../services/waveService';
+import type { ListingFormData } from '../types/checkout';
 
 interface Category {
   id: string;
@@ -24,7 +26,6 @@ const PublishPage: React.FC = () => {
   const { user } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState(false);
   const [categories, setCategories] = useState<CategoryWithSubs[]>([]);
   const [loadingCategories, setLoadingCategories] = useState(true);
   
@@ -189,32 +190,67 @@ const PublishPage: React.FC = () => {
     }
 
     try {
-      // TODO: Implement actual API call to create listing
-      // For now, simulate success
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Create Wave checkout session for listing publication fee
+      const listingPrice = waveService.getListingPrice();
+      const sessionId = `session_${Date.now()}_${user?.id}`;
       
-      setSuccess(true);
-      
-      // Reset form
-      setFormData({
-        title: '',
-        description: '',
-        price: '',
-        category: '',
-        subcategory: '',
-        location: '',
-        condition: 'new',
-        phone: '',
-      });
-      setImages([]);
-      setImagePreviews([]);
+      const listingData: ListingFormData = {
+        title: formData.title,
+        description: formData.description,
+        price: formData.price,
+        category: formData.category,
+        subcategory: formData.subcategory,
+        location: formData.location,
+        condition: formData.condition,
+        phone: formData.phone,
+        images: images
+      };
 
-      // Redirect after success
-      setTimeout(() => {
-        navigate('/annonces');
-      }, 2000);
-    } catch {
-      setError('Une erreur est survenue lors de la publication');
+      // Create Wave checkout session
+      const waveResponse = await waveService.createCheckoutSession({
+        amount: waveService.formatAmount(listingPrice),
+        currency: 'XOF',
+        success_url: waveService.generateSuccessUrl(sessionId),
+        error_url: waveService.generateErrorUrl(sessionId),
+        client_reference: `listing_${Date.now()}`
+      });
+
+      if (!waveResponse.success || !waveResponse.data) {
+        throw new Error(waveResponse.error || 'Erreur lors de la création de la session de paiement');
+      }
+
+      const waveSession = waveResponse.data;
+
+      // Store checkout session in database
+      const expiresAt = new Date();
+      expiresAt.setMinutes(expiresAt.getMinutes() + 30); // 30 minutes expiry
+
+      const { error: dbError } = await (supabase as any)
+        .from('checkout_sessions')
+        .insert({
+          wave_session_id: waveSession.id,
+          user_id: user!.id,
+          amount: listingPrice,
+          currency: 'XOF',
+          wave_launch_url: waveSession.wave_launch_url,
+          success_url: waveSession.success_url,
+          error_url: waveSession.error_url,
+          client_reference: waveSession.client_reference,
+          listing_data: listingData,
+          when_expires: expiresAt.toISOString()
+        });
+
+      if (dbError) {
+        console.error('Database error:', dbError);
+        throw new Error('Erreur lors de la sauvegarde de la session');
+      }
+
+      // Redirect to Wave payment
+      window.location.href = waveSession.wave_launch_url;
+      
+    } catch (error) {
+      console.error('Payment error:', error);
+      setError(error instanceof Error ? error.message : 'Une erreur est survenue lors de la création du paiement');
     } finally {
       setIsLoading(false);
     }
@@ -244,26 +280,27 @@ const PublishPage: React.FC = () => {
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
               Publier une annonce
             </h1>
-            <p className="text-gray-600">
+            <p className="text-gray-600 mb-3">
               Remplissez les informations ci-dessous pour publier votre annonce
             </p>
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="flex items-center gap-3">
+                <div className="flex-shrink-0">
+                  <DollarSign className="h-5 w-5 text-blue-600" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-blue-900 text-left">
+                    Frais de publication : 500 F CFA
+                  </p>
+                  <p className="text-xs text-blue-700 text-left">
+                    Paiement sécurisé via Wave • Annonce active immédiatement après paiement
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Success Message */}
-        {success && (
-          <div className="bg-green-50 border border-green-200 text-green-700 px-6 py-4 rounded-lg mb-6 flex items-center gap-3">
-            <div className="flex-shrink-0">
-              <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-              </svg>
-            </div>
-            <div>
-              <p className="font-medium">Annonce publiée avec succès!</p>
-              <p className="text-sm">Vous allez être redirigé vers la page des annonces...</p>
-            </div>
-          </div>
-        )}
 
         {/* Error Message */}
         {error && (
@@ -546,7 +583,7 @@ const PublishPage: React.FC = () => {
                 disabled={isLoading}
                 className="bg-red-600 hover:bg-red-700 text-white px-8"
               >
-                {isLoading ? 'Publication...' : 'Publier l\'annonce'}
+                {isLoading ? 'Création du paiement...' : 'Payer et publier (500 F CFA)'}
               </Button>
             </div>
           </div>

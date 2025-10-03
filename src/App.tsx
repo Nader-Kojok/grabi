@@ -15,6 +15,8 @@ import PublicProfilePage from './pages/PublicProfilePage';
 import PublishPage from './pages/PublishPage';
 import MyListingsPage from './pages/MyListingsPage';
 import SettingsPage from './pages/SettingsPage';
+import PaymentSuccessPage from './pages/PaymentSuccessPage';
+import PaymentErrorPage from './pages/PaymentErrorPage';
 import './App.css';
 
 // Create a client
@@ -46,6 +48,8 @@ function App() {
             <Route path="/publier" element={<PublishPage />} />
             <Route path="/mes-annonces" element={<MyListingsPage />} />
             <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/payment/success" element={<PaymentSuccessPage />} />
+            <Route path="/payment/error" element={<PaymentErrorPage />} />
           </Routes>
         </div>
       </Router>
