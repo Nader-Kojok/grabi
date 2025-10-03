@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
-import { ArrowLeft, UserCircle, MapPin, Calendar, Mail, Activity, Link as LinkIcon, Star } from 'lucide-react'
+import { ArrowLeft, UserCircle, MapPin, Calendar, Mail, Activity, Link as LinkIcon, Star, Phone } from 'lucide-react'
 import { Button } from '../components/ui/button'
 import { VerificationBadges } from '../components/ui/verification-badges'
 import RatingSummary from '../components/RatingSummary'
@@ -54,6 +54,13 @@ function PublicProfilePage() {
         return
       }
 
+      // Check if profile is private and current user is not the owner
+      if (!data.is_profile_public && (!currentUser || currentUser.id !== data.id)) {
+        setError('Ce profil est privé')
+        setLoading(false)
+        return
+      }
+
       // Transform database profile to User type
       const sellerProfile: User = {
         id: data.id,
@@ -71,7 +78,11 @@ function PublicProfilePage() {
         verificationBadges: data.verification_badges || [],
         profileCompletionPercentage: data.profile_completion_percentage || 0,
         sellerRating: data.seller_rating || undefined,
-        reviewCount: data.review_count || 0
+        reviewCount: data.review_count || 0,
+        isProfilePublic: data.is_profile_public || false,
+        showEmail: data.show_email || false,
+        showPhone: data.show_phone || false,
+        allowReviews: data.allow_reviews || false
       }
 
       setSeller(sellerProfile)
@@ -81,7 +92,7 @@ function PublicProfilePage() {
     } finally {
       setLoading(false)
     }
-  }, [id])
+  }, [id, currentUser])
   
   // Define fetchSellerListings with useCallback
   const fetchSellerListings = useCallback(async () => {
@@ -176,7 +187,9 @@ function PublicProfilePage() {
               {error || 'Profil non trouvé'}
             </h2>
             <p className="text-gray-600 mb-6">
-              Le profil que vous recherchez n'existe pas ou n'est plus disponible.
+              {error === 'Ce profil est privé' 
+                ? 'Ce profil est configuré comme privé et n\'est pas accessible publiquement.'
+                : 'Le profil que vous recherchez n\'existe pas ou n\'est plus disponible.'}
             </p>
             <Button onClick={() => navigate('/')} className="bg-red-600 hover:bg-red-700">
               Retour à l'accueil
@@ -385,13 +398,20 @@ function PublicProfilePage() {
                   <h2 className="text-xl font-semibold text-gray-900 text-left">Évaluations</h2>
                 </div>
                 
-                {/* Show review form if current user is not the seller */}
-                {currentUser && currentUser.id !== seller.id && (
+                {/* Show review form if current user is not the seller and reviews are allowed */}
+                {currentUser && currentUser.id !== seller.id && seller.allowReviews && (
                   <div className="mb-8">
                     <ReviewForm 
                       sellerId={seller.id} 
                       onReviewSubmitted={handleReviewSubmitted}
                     />
+                  </div>
+                )}
+                
+                {/* Show message if reviews are disabled */}
+                {(!seller.allowReviews) && (
+                  <div className="py-8 text-gray-500 text-left">
+                    <p>Les évaluations sont désactivées pour ce vendeur.</p>
                   </div>
                 )}
                 
@@ -430,6 +450,24 @@ function PublicProfilePage() {
                     >
                       {seller.website}
                     </a>
+                  </div>
+                </div>
+              )}
+              
+              {seller.showEmail && seller.email && (
+                <div className="py-3 border-t border-gray-100">
+                  <div className="flex items-center gap-3">
+                    <Mail className="h-4 w-4 text-gray-400" />
+                    <span className="text-gray-600">{seller.email}</span>
+                  </div>
+                </div>
+              )}
+              
+              {seller.showPhone && seller.phone && (
+                <div className="py-3 border-t border-gray-100">
+                  <div className="flex items-center gap-3">
+                    <Phone className="h-4 w-4 text-gray-400" />
+                    <span className="text-gray-600">{seller.phone}</span>
                   </div>
                 </div>
               )}

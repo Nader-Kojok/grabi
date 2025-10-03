@@ -24,6 +24,7 @@ import { Input } from '../components/ui/input';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { useAuthStore } from '../stores/authStore';
+import { supabase } from '../lib/supabase';
 
 const SettingsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -64,6 +65,7 @@ const SettingsPage: React.FC = () => {
     showPhone: user?.showPhone ?? false,
     allowReviews: user?.allowReviews ?? true
   });
+  const [loadingPrivacy, setLoadingPrivacy] = useState(false);
 
   useEffect(() => {
     // Load user preferences from localStorage or API
@@ -76,7 +78,17 @@ const SettingsPage: React.FC = () => {
     if (savedNotifications) {
       setNotificationSettings(JSON.parse(savedNotifications));
     }
-  }, []);
+
+    // Load privacy settings from user object when user changes
+    if (user) {
+      setPrivacySettings({
+        isProfilePublic: user.isProfilePublic ?? true,
+        showEmail: user.showEmail ?? false,
+        showPhone: user.showPhone ?? false,
+        allowReviews: user.allowReviews ?? true
+      });
+    }
+  }, [user]);
 
   const handlePasswordChange = async () => {
     if (passwordData.newPassword !== passwordData.confirmPassword) {
@@ -116,18 +128,34 @@ const SettingsPage: React.FC = () => {
   };
 
   const handlePrivacySave = async () => {
-    setIsLoading(true);
+    if (!user) return;
+    
+    setLoadingPrivacy(true);
     setMessage(null);
 
     try {
-      // TODO: Implement privacy settings update with Supabase
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          is_profile_public: privacySettings.isProfilePublic,
+          show_email: privacySettings.showEmail,
+          show_phone: privacySettings.showPhone,
+          allow_reviews: privacySettings.allowReviews
+        })
+        .eq('id', user.id);
+
+      if (error) throw error;
+
       setMessage({ type: 'success', text: 'Paramètres de confidentialité enregistrés!' });
+      
+      // Update the user in the auth store
+      // This would require updating the auth store to refresh user data
+      // For now, we'll just show the success message
     } catch (error) {
       console.error('Error updating privacy settings:', error);
       setMessage({ type: 'error', text: 'Erreur lors de la sauvegarde des paramètres' });
     } finally {
-      setIsLoading(false);
+      setLoadingPrivacy(false);
     }
   };
 
@@ -386,11 +414,11 @@ const SettingsPage: React.FC = () => {
 
                   <Button
                     onClick={handlePrivacySave}
-                    disabled={isLoading}
+                    disabled={loadingPrivacy}
                     className="mt-6 bg-red-600 hover:bg-red-700 flex items-center gap-2"
                   >
                     <Save className="h-4 w-4" />
-                    {isLoading ? 'Enregistrement...' : 'Enregistrer les paramètres'}
+                    {loadingPrivacy ? 'Enregistrement...' : 'Enregistrer les paramètres'}
                   </Button>
                 </div>
               </div>
