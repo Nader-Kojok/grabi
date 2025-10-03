@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   ArrowLeft, 
@@ -20,6 +20,39 @@ import RatingSummary from '../components/RatingSummary';
 import ReviewList from '../components/ReviewList';
 import { mockFeaturedProducts } from '../data/mockData';
 import { formatCurrency } from '../utils/currency';
+import { supabase } from '../lib/supabase';
+
+interface DatabaseListing {
+  id: string;
+  title: string;
+  description: string;
+  price: number;
+  currency: string;
+  location: string;
+  images: string[];
+  condition: string;
+  phone: string | null;
+  status: string;
+  views: number;
+  created_at: string;
+  user_id: string;
+  category: {
+    id: string;
+    name: string;
+  } | null;
+  subcategory: {
+    id: string;
+    name: string;
+  } | null;
+  profile: {
+    id: string;
+    first_name: string;
+    last_name: string;
+    avatar_url: string | null;
+    seller_rating: number | null;
+    review_count: number | null;
+  } | null;
+}
 
 const ProductPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -27,21 +60,88 @@ const ProductPage: React.FC = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
   const [showFullDescription, setShowFullDescription] = useState(false);
+  const [listing, setListing] = useState<DatabaseListing | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  // Pour la démo, on utilise les données mockées
-  // En production, on ferait un appel API avec l'id
-  const product = mockFeaturedProducts.find(p => p.id === id) || mockFeaturedProducts[0];
+  // Fetch listing data from Supabase
+  useEffect(() => {
+    const fetchListing = async () => {
+      if (!id) {
+        setError('ID de l\'annonce manquant');
+        setIsLoading(false);
+        return;
+      }
 
-  // Images simulées pour la galerie
-  const productImages = [
-    product.image,
-    'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&h=600&fit=crop&crop=center',
-    'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&h=600&fit=crop&crop=left',
-    'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&h=600&fit=crop&crop=right'
-  ];
+      try {
+        setIsLoading(true);
+        setError('');
 
-  // Description simulée détaillée
-  const fullDescription = `Cette magnifique ${product.title} est en excellent état et prête à être utilisée. 
+        const { data, error: fetchError } = await supabase
+          .from('listings')
+          .select(`
+            *,
+            category:categories!category_id(id, name),
+            subcategory:categories!subcategory_id(id, name),
+            profile:profiles!user_id(id, first_name, last_name, avatar_url, seller_rating, review_count)
+          `)
+          .eq('id', id)
+          .eq('status', 'active')
+          .single();
+
+        if (fetchError) {
+          if (fetchError.code === 'PGRST116') {
+            setError('Annonce non trouvée ou non disponible');
+          } else {
+            throw fetchError;
+          }
+          return;
+        }
+
+        if (data) {
+          setListing(data as unknown as DatabaseListing);
+          
+          // Increment view count
+          await supabase
+            .from('listings')
+            .update({ views: (data.views || 0) + 1 })
+            .eq('id', id);
+        }
+      } catch (err) {
+        console.error('Error fetching listing:', err);
+        setError('Erreur lors du chargement de l\'annonce');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchListing();
+  }, [id]);
+
+  // Use real listing data or fallback to mock data
+  const mockProduct = mockFeaturedProducts.find(p => p.id === id) || mockFeaturedProducts[0];
+
+  // Use real images from listing or fallback to mock images
+  const getProductImages = () => {
+    if (listing) {
+      return listing.images && listing.images.length > 0 
+        ? listing.images 
+        : ['/images/placeholder.jpg'];
+    }
+    return [
+      mockProduct.image || '/images/placeholder.jpg',
+      'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&h=600&fit=crop&crop=center',
+      'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&h=600&fit=crop&crop=left',
+      'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&h=600&fit=crop&crop=right'
+    ];
+  };
+  
+  const productImages = getProductImages();
+
+  // Use real description or fallback
+  const fullDescription = listing 
+    ? listing.description 
+    : `Cette magnifique ${mockProduct.title} est en excellent état et prête à être utilisée. 
 
 Caractéristiques principales :
 • État impeccable, très peu utilisé
@@ -52,7 +152,7 @@ Caractéristiques principales :
 
 L'article a été soigneusement entretenu et stocké dans un environnement optimal. Aucun défaut visible, fonctionne parfaitement.
 
-Possibilité de livraison dans un rayon de 50km ou remise en main propre sur ${product.location}.
+Possibilité de livraison dans un rayon de 50km ou remise en main propre sur ${mockProduct.location}.
 
 N'hésitez pas à me contacter pour plus d'informations ou pour organiser une visite.`;
 
@@ -78,9 +178,10 @@ N'hésitez pas à me contacter pour plus d'informations ou pour organiser une vi
   const handleShare = async () => {
     if (navigator.share) {
       try {
+        const title = listing ? listing.title : mockProduct.title;
         await navigator.share({
-          title: product.title,
-          text: `Découvrez cette annonce sur Grabi : ${product.title}`,
+          title,
+          text: `Découvrez cette annonce sur Grabi : ${title}`,
           url: window.location.href,
         });
       } catch (error) {
@@ -92,6 +193,45 @@ N'hésitez pas à me contacter pour plus d'informations ou pour organiser une vi
       // Ici on pourrait afficher une notification
     }
   };
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex items-center justify-center min-h-96">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600"></div>
+            <span className="ml-3 text-gray-600">Chargement de l'annonce...</span>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="text-center">
+            <div className="bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-lg">
+              <p className="font-medium">{error}</p>
+              <button 
+                onClick={() => navigate(-1)}
+                className="mt-4 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
+              >
+                Retour
+              </button>
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -141,7 +281,7 @@ N'hésitez pas à me contacter pour plus d'informations ou pour organiser une vi
               <div className="relative h-96 md:h-[500px] bg-gray-100">
                 <img
                   src={productImages[currentImageIndex]}
-                  alt={product.title}
+                  alt={listing ? listing.title : mockProduct.title}
                   className="w-full h-full object-cover"
                 />
                 
@@ -163,27 +303,30 @@ N'hésitez pas à me contacter pour plus d'informations ou pour organiser une vi
                     
                     {/* Indicateurs */}
                     <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
-                      {productImages.map((_, index) => (
-                        <button
-                          key={`indicator-${index}`}
-                          onClick={() => setCurrentImageIndex(index)}
-                          className={`w-2 h-2 rounded-full transition-colors ${
-                            index === currentImageIndex ? 'bg-white' : 'bg-white/50'
-                          }`}
-                        />
-                      ))}
+                      {productImages.map((_, index) => {
+                        const uniqueKey = `indicator-${listing?.id || mockProduct.id}-${index}`;
+                        return (
+                          <button
+                            key={uniqueKey}
+                            onClick={() => setCurrentImageIndex(index)}
+                            className={`w-2 h-2 rounded-full transition-colors ${
+                              index === currentImageIndex ? 'bg-white' : 'bg-white/50'
+                            }`}
+                          />
+                        );
+                      })}
                     </div>
                   </>
                 )}
                 
                 {/* Badges */}
                 <div className="absolute top-4 left-4 flex flex-col gap-2">
-                  {product.id === 'featured-2' && (
+                  {mockProduct.id === 'featured-2' && (
                     <span className="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium">
                       Urgent
                     </span>
                   )}
-                  {(product.id === 'featured-1' || product.id === 'featured-4') && (
+                  {(mockProduct.id === 'featured-1' || mockProduct.id === 'featured-4') && (
                     <span className="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">
                       Livraison possible
                     </span>
@@ -195,23 +338,27 @@ N'hésitez pas à me contacter pour plus d'informations ou pour organiser une vi
               {productImages.length > 1 && (
                 <div className="p-4 border-t">
                   <div className="flex space-x-3 overflow-x-auto">
-                    {productImages.map((image, index) => (
-                      <button
-                        key={`thumbnail-${index}`}
-                        onClick={() => setCurrentImageIndex(index)}
-                        className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-colors ${
-                          index === currentImageIndex 
-                            ? 'border-red-500' 
-                            : 'border-gray-200 hover:border-gray-300'
-                        }`}
-                      >
-                        <img
-                          src={image}
-                          alt={`${product.title} - Vue ${index + 1}`}
-                          className="w-full h-full object-cover"
-                        />
-                      </button>
-                    ))}
+                    {productImages.map((image, index) => {
+                      const uniqueKey = `thumbnail-${listing?.id || mockProduct.id}-${index}`;
+                      const title = listing ? listing.title : mockProduct.title;
+                      return (
+                        <button
+                          key={uniqueKey}
+                          onClick={() => setCurrentImageIndex(index)}
+                          className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-colors ${
+                            index === currentImageIndex 
+                              ? 'border-red-500' 
+                              : 'border-gray-200 hover:border-gray-300'
+                          }`}
+                        >
+                          <img
+                            src={image}
+                            alt={`${title} - Vue ${index + 1}`}
+                            className="w-full h-full object-cover"
+                          />
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -225,10 +372,10 @@ N'hésitez pas à me contacter pour plus d'informations ou pour organiser une vi
               <div className="flex items-start justify-between mb-4">
                 <div>
                   <h1 className="text-2xl font-bold text-gray-900 mb-2 text-left">
-                    {product.title}
+                    {listing ? listing.title : mockProduct.title}
                   </h1>
                   <p className="text-3xl font-bold text-red-600 text-left">
-                    {formatCurrency(product.price)}
+                    {formatCurrency(listing ? listing.price : mockProduct.price)}
                   </p>
                 </div>
               </div>
@@ -237,15 +384,15 @@ N'hésitez pas à me contacter pour plus d'informations ou pour organiser une vi
               <div className="space-y-3 text-sm text-gray-600">
                 <div className="flex items-center">
                   <MapPin className="h-4 w-4 mr-2 text-gray-400" />
-                  <span className="text-left">{product.location}</span>
+                  <span className="text-left">{listing ? listing.location : mockProduct.location}</span>
                 </div>
                 <div className="flex items-center">
                   <Calendar className="h-4 w-4 mr-2 text-gray-400" />
-                  <span className="text-left">{formatTimeAgo(product.createdAt)}</span>
+                  <span className="text-left">{formatTimeAgo(listing ? new Date(listing.created_at) : mockProduct.createdAt)}</span>
                 </div>
                 <div className="flex items-center">
                   <Eye className="h-4 w-4 mr-2 text-gray-400" />
-                  <span className="text-left">247 vues</span>
+                  <span className="text-left">{listing ? listing.views || 0 : 247} vues</span>
                 </div>
               </div>
             </div>
@@ -258,30 +405,34 @@ N'hésitez pas à me contacter pour plus d'informations ou pour organiser une vi
               
               <div className="flex items-center mb-4">
                 <img
-                  src={product.user.avatar || '/default-avatar.svg'}
-                  alt={product.user.name}
+                  src={listing?.profile?.avatar_url || mockProduct.user?.avatar || '/default-avatar.svg'}
+                  alt={listing?.profile ? `${listing.profile.first_name} ${listing.profile.last_name}` : mockProduct.user?.name || 'Vendeur'}
                   className="w-12 h-12 rounded-full mr-4"
                 />
                 <div className="flex-1">
                   <h4 className="font-semibold text-gray-900 text-left">
-                    {product.user.name}
+                    {listing?.profile 
+                      ? `${listing.profile.first_name} ${listing.profile.last_name}` 
+                      : mockProduct.user?.name || 'Vendeur anonyme'
+                    }
                   </h4>
                   <RatingSummary 
                     user={{
-                      id: product.user.id,
-                      name: product.user.name,
+                      id: listing?.profile?.id || mockProduct.user?.id || '',
+                      name: listing?.profile 
+                        ? `${listing.profile.first_name} ${listing.profile.last_name}` 
+                        : mockProduct.user?.name || 'Vendeur',
                       email: '',
-                      sellerRating: 4.8,
-                      reviewCount: 23
+                      sellerRating: listing?.profile?.seller_rating || 4.8,
+                      reviewCount: listing?.profile?.review_count || 23
                     }}
-                    size="sm"
                     showCount={true}
                     className="text-sm"
                   />
                 </div>
               </div>
               
-              <div className="flex items-center text-sm text-gray-600 mb-4">
+              <div className="flex items-center text-sm text-green-600 mb-4">
                 <Shield className="h-4 w-4 mr-2 text-green-500" />
                 <span className="text-left">Profil vérifié</span>
               </div>
@@ -347,7 +498,7 @@ N'hésitez pas à me contacter pour plus d'informations ou pour organiser une vi
           </h2>
           
           <ReviewList 
-            sellerId={product.user.id}
+            sellerId={listing?.profile?.id || mockProduct.user?.id || ''}
             limit={3}
             showLoadMore={false}
           />

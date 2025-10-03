@@ -325,6 +325,14 @@ const Header: React.FC = () => {
                             Mon profil
                           </Link>
                           <Link
+                            to="/mes-annonces"
+                            className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                            onClick={() => setShowUserDropdown(false)}
+                          >
+                            <Package className="h-4 w-4 mr-3" />
+                            Mes annonces
+                          </Link>
+                          <Link
                             to="/settings"
                             className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                             onClick={() => setShowUserDropdown(false)}
@@ -385,10 +393,10 @@ const Header: React.FC = () => {
           />
           
           {/* Mobile Menu Panel - slides from right */}
-          <aside 
+          <dialog 
             className="absolute right-0 top-0 bg-white w-64 h-full shadow-xl transform transition-transform duration-300 ease-in-out" 
-            role="dialog"
             aria-label="Menu mobile"
+            open
           >
             <div className="p-4 border-b border-gray-200">
               <div className="flex items-center justify-between">
@@ -455,6 +463,15 @@ const Header: React.FC = () => {
                   </Link>
                   
                   <Link 
+                    to="/mes-annonces" 
+                    className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                    onClick={() => setShowMobileMenu(false)}
+                  >
+                    <Package className="h-5 w-5 text-gray-600" />
+                    <span className="text-gray-800 font-medium">Mes annonces</span>
+                  </Link>
+                  
+                  <Link 
                     to="/settings" 
                     className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
                     onClick={() => setShowMobileMenu(false)}
@@ -497,7 +514,7 @@ const Header: React.FC = () => {
                 </Link>
               </div>
             </div>
-          </aside>
+          </dialog>
         </div>
       )}
 
@@ -535,7 +552,6 @@ const Header: React.FC = () => {
                         className="flex items-center gap-1 text-sm font-medium text-gray-700 hover:text-red-600 transition-colors px-3 py-2 rounded hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1"
                         onKeyDown={(e) => handleKeyDown(e, category.id)}
                         tabIndex={0}
-                        role="button"
                         aria-haspopup="true"
                         aria-expanded={hoveredCategory === category.id}
                         aria-label={`${category.name} - Voir les sous-catégories`}

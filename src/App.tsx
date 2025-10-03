@@ -13,6 +13,7 @@ import RegisterPage from './pages/RegisterPage';
 import ProfilePage from './pages/ProfilePage';
 import PublicProfilePage from './pages/PublicProfilePage';
 import PublishPage from './pages/PublishPage';
+import MyListingsPage from './pages/MyListingsPage';
 import SettingsPage from './pages/SettingsPage';
 import './App.css';
 
@@ -43,6 +44,7 @@ function App() {
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/profile/:id" element={<PublicProfilePage />} />
             <Route path="/publier" element={<PublishPage />} />
+            <Route path="/mes-annonces" element={<MyListingsPage />} />
             <Route path="/settings" element={<SettingsPage />} />
           </Routes>
         </div>
