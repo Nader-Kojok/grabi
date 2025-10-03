@@ -1,170 +1,29 @@
 import React from 'react';
-import { Car, Home, Smartphone, Shirt, Wrench, Briefcase, MapPin, Baby, Hammer, Package } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Package } from 'lucide-react';
+import { allCategories } from '../utils/categories';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 
 const AllCategoriesPage: React.FC = () => {
-  const categories = [
-    {
-      title: 'Véhicules',
-      icon: <Car className="w-8 h-8" />,
-      color: 'text-blue-600',
-      description: 'Voitures, motos, camions et autres véhicules',
-      link: 'Voir toutes les annonces >',
-      subcategories: [
-        'Voitures',
-        'Motos', 
-        'Camions',
-        'Bateaux',
-        'Caravaning',
-        'Utilitaires',
-        'Nautisme'
-      ]
-    },
-    {
-      title: 'Immobilier',
-      icon: <Home className="w-8 h-8" />,
-      color: 'text-green-600',
-      description: 'Appartements, maisons, terrains et locaux commerciaux',
-      link: 'Voir toutes les annonces >',
-      subcategories: [
-        'Appartements',
-        'Maisons',
-        'Terrains', 
-        'Locaux commerciaux',
-        'Colocations',
-        'Bureaux & Commerces'
-      ]
-    },
-    {
-      title: 'Électronique',
-      icon: <Smartphone className="w-8 h-8" />,
-      color: 'text-purple-600',
-      description: 'Téléphones, ordinateurs et appareils électroniques',
-      link: 'Voir toutes les annonces >',
-      subcategories: [
-        'Téléphones & Objets connectés',
-        'Ordinateurs',
-        'Accessoires informatiques',
-        'Photo & vidéo'
-      ]
-    },
-    {
-      title: 'Mode',
-      icon: <Shirt className="w-8 h-8" />,
-      color: 'text-pink-600',
-      description: 'Vêtements, chaussures et accessoires de mode',
-      link: 'Voir toutes les annonces >',
-      subcategories: [
-        'Vêtements',
-        'Chaussures',
-        'Accessoires',
-        'Montres & Bijoux'
-      ]
-    },
-    {
-      title: 'Maison & Jardin',
-      icon: <Wrench className="w-8 h-8" />,
-      color: 'text-orange-600',
-      description: 'Ameublement, décoration et équipements pour la maison',
-      link: 'Voir toutes les annonces >',
-      subcategories: [
-        'Ameublement',
-        'Appareils électroménagers',
-        'Décoration',
-        'Plantes & jardin',
-        'Bricolage'
-      ]
-    },
-    {
-      title: 'Services',
-      icon: <Briefcase className="w-8 h-8" />,
-      color: 'text-indigo-600',
-      description: 'Services aux entreprises et à la personne',
-      link: 'Voir toutes les annonces >',
-      subcategories: [
-        'Services aux entreprises',
-        'Services à la personne',
-        'Événements',
-        'Artisans & Musiciens',
-        'Baby-Sitting',
-        'Cours particuliers'
-      ]
-    },
-    {
-      title: 'Emploi',
-      icon: <Briefcase className="w-8 h-8" />,
-      color: 'text-slate-600',
-      description: 'Offres d\'emploi et formations professionnelles',
-      link: 'Voir toutes les annonces >',
-      subcategories: [
-        'Offres d\'emploi',
-        'Formations professionnelles'
-      ]
-    },
-    {
-      title: 'Locations de vacances',
-      icon: <MapPin className="w-8 h-8" />,
-      color: 'text-teal-600',
-      description: 'Locations saisonnières et voyages',
-      link: 'Voir toutes les annonces >',
-      subcategories: [
-        'Locations saisonnières',
-        'Ventes flash vacances',
-        'Locations Europe'
-      ]
-    },
-    {
-      title: 'Famille',
-      icon: <Baby className="w-8 h-8" />,
-      color: 'text-yellow-600',
-      description: 'Équipements et mobilier pour enfants',
-      link: 'Voir toutes les annonces >',
-      subcategories: [
-        'Équipement bébé',
-        'Mobilier enfant',
-        'Jouets'
-      ]
-    },
-    {
-      title: 'Loisirs',
-      icon: <Package className="w-8 h-8" />,
-      color: 'text-red-600',
-      description: 'Divertissement, sport et activités de loisirs',
-      link: 'Voir toutes les annonces >',
-      subcategories: [
-        'CD - Musique',
-        'DVD - Films',
-        'Livres',
-        'Jeux & Jouets',
-        'Sport & Plein Air'
-      ]
-    },
-    {
-      title: 'Matériel professionnel',
-      icon: <Hammer className="w-8 h-8" />,
-      color: 'text-amber-600',
-      description: 'Équipements et matériel professionnel',
-      link: 'Voir toutes les annonces >',
-      subcategories: [
-        'Tracteurs',
-        'BTP - Chantier',
-        'Matériel agricole',
-        'Équipements pros'
-      ]
-    },
-    {
-      title: 'Autre',
-      icon: <Package className="w-8 h-8" />,
-      color: 'text-gray-600',
-      description: 'Articles divers et non catégorisés',
-      link: 'Voir toutes les annonces >',
-      subcategories: [
-        'Divers',
-        'Non catégorisé'
-      ]
-    }
-  ];
+  // Helper function to get category description
+  const getCategoryDescription = (categoryName: string): string => {
+    const descriptions: Record<string, string> = {
+      'Véhicules': 'Voitures, motos, camions et autres véhicules',
+      'Immobilier': 'Appartements, maisons, terrains et locaux commerciaux',
+      'Electronique': 'Téléphones, ordinateurs et appareils électroniques',
+      'Mode': 'Vêtements, chaussures et accessoires de mode',
+      'Maison & Jardin': 'Ameublement, décoration et équipements pour la maison',
+      'Services': 'Services aux entreprises et à la personne',
+      'Emploi': 'Offres d\'emploi et formations professionnelles',
+      'Locations de vacances': 'Locations saisonnières et voyages',
+      'Famille': 'Équipements et mobilier pour enfants',
+      'Loisirs': 'Divertissement, sport et activités de loisirs',
+      'Matériel professionnel': 'Équipements et matériel professionnel',
+      'Autre': 'Articles divers et non catégorisés'
+    };
+    return descriptions[categoryName] || '';
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -173,7 +32,7 @@ const AllCategoriesPage: React.FC = () => {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Breadcrumb */}
         <nav className="flex items-center space-x-2 text-sm text-gray-600 mb-6">
-          <a href="/" className="hover:text-gray-900">🏠 Accueil</a>
+          <Link to="/" className="hover:text-gray-900">🏠 Accueil</Link>
           <span>&gt;</span>
           <span className="text-gray-900">Toutes les catégories</span>
         </nav>
@@ -195,51 +54,58 @@ const AllCategoriesPage: React.FC = () => {
 
         {/* Categories Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {categories.map((category, index) => (
-            <div key={index} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
-              {/* Category Header */}
-              <div className="flex items-center mb-4">
-                <div className={`${category.color} mr-3`}>
-                  {category.icon}
+          {allCategories.map((category) => {
+            const IconComponent = category.icon;
+            return (
+              <div key={category.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+                {/* Category Header */}
+                <div className="flex items-center mb-4">
+                  <div className={`${category.color} mr-3`}>
+                    <IconComponent className="w-8 h-8" />
+                  </div>
+                  <div>
+                    <h2 className={`text-xl font-bold ${category.color} text-left`}>
+                      {category.name}
+                    </h2>
+                    <p className="text-gray-600 text-sm mt-1 text-left">
+                      {getCategoryDescription(category.name)}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h2 className={`text-xl font-bold ${category.color}`}>
-                    {category.title}
-                  </h2>
-                  <p className="text-gray-600 text-sm mt-1">
-                    {category.description}
-                  </p>
+
+                {/* Subcategories */}
+                <div className="mb-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wide text-left">
+                      SOUS-CATÉGORIES ({category.subcategories.length})
+                    </h3>
+                    <Link 
+                      to={`/category/${category.slug}`} 
+                      className={`${category.color} text-xs font-medium hover:opacity-80 transition-opacity flex items-center gap-1`}
+                    >
+                      Tout voir
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </Link>
+                  </div>
+                  <ul className="space-y-2">
+                    {category.subcategories.map((subcategory) => (
+                      <li key={subcategory.slug}>
+                        <Link 
+                          to={`/category/${category.slug}/${subcategory.slug}`}
+                          className="text-gray-700 hover:text-gray-900 text-sm transition-colors duration-200 hover:underline flex items-center justify-between"
+                        >
+                          <span>{subcategory.name}</span>
+                          <span className="text-gray-400">&gt;</span>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               </div>
-
-              {/* Link */}
-              <div className="mb-4">
-                <a href="#" className={`${category.color} text-sm font-medium hover:underline`}>
-                Voir toutes les annonces &gt;
-              </a>
-              </div>
-
-              {/* Subcategories */}
-              <div>
-                <h3 className="text-sm font-semibold text-gray-900 mb-3 uppercase tracking-wide">
-                  SOUS-CATÉGORIES ({category.subcategories.length})
-                </h3>
-                <ul className="space-y-2">
-                  {category.subcategories.map((subcategory, subIndex) => (
-                    <li key={subIndex}>
-                      <a 
-                        href="#" 
-                        className="text-gray-700 hover:text-gray-900 text-sm transition-colors duration-200 hover:underline flex items-center justify-between"
-                      >
-                        <span>{subcategory}</span>
-                        <span className="text-gray-400">&gt;</span>
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </main>
 

@@ -38,7 +38,7 @@ export const ProfileCompletionIndicator: React.FC<ProfileCompletionIndicatorProp
   return (
     <div className={`bg-white rounded-lg border border-gray-200 p-4 ${className}`}>
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-lg font-semibold text-gray-900">Progression du profil</h3>
+        <h3 className="text-lg font-semibold text-gray-900 text-left">Progression du profil</h3>
         <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor()}`}>
           {percentage}%
         </span>

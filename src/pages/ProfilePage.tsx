@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Edit, Save, X, UserCircle, Phone, MapPin, Calendar, Mail, Settings, Shield, Bell, CreditCard, Activity, Link } from 'lucide-react';
+import { useNavigate, Link } from 'react-router-dom';
+import { ArrowLeft, Edit, Save, X, UserCircle, Phone, MapPin, Calendar, Mail, Settings, Shield, Bell, CreditCard, Activity, Link as LinkIcon, Plus } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { FileUpload } from '../components/ui/file-upload';
@@ -127,6 +127,7 @@ const ProfilePage: React.FC = () => {
       setIsEditing(false);
       setMessage({ type: 'success', text: 'Profil mis à jour avec succès!' });
     } catch (error) {
+      console.error('Error updating profile:', error);
       setMessage({ type: 'error', text: 'Erreur lors de la mise à jour du profil' });
     } finally {
       setIsLoading(false);
@@ -314,14 +315,15 @@ const ProfilePage: React.FC = () => {
                 <div className="p-2 bg-red-50 rounded-lg">
                   <UserCircle className="h-5 w-5 text-red-600" />
                 </div>
-                <h2 className="text-xl font-semibold text-gray-900">Informations personnelles</h2>
+                <h2 className="text-xl font-semibold text-gray-900 text-left">Informations personnelles</h2>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-3">
-                  <label className="block text-sm font-semibold text-gray-900 text-left">Prénom</label>
+                  <label htmlFor="firstName" className="block text-sm font-semibold text-gray-900 text-left">Prénom</label>
                   {isEditing ? (
                     <Input
+                      id="firstName"
                       value={formData.firstName}
                       onChange={(e) => handleInputChange('firstName', e.target.value)}
                       placeholder="Votre prénom"
@@ -335,9 +337,10 @@ const ProfilePage: React.FC = () => {
                 </div>
                 
                 <div className="space-y-3">
-                  <label className="block text-sm font-semibold text-gray-900 text-left">Nom</label>
+                  <label htmlFor="lastName" className="block text-sm font-semibold text-gray-900 text-left">Nom</label>
                   {isEditing ? (
                     <Input
+                      id="lastName"
                       value={formData.lastName}
                       onChange={(e) => handleInputChange('lastName', e.target.value)}
                       placeholder="Votre nom"
@@ -351,17 +354,18 @@ const ProfilePage: React.FC = () => {
                 </div>
                 
                 <div className="space-y-3">
-                  <label className="block text-sm font-semibold text-gray-900 text-left">Email</label>
-                  <div className="flex items-center gap-3 py-3 px-4 bg-gray-50 rounded-lg text-gray-600 border border-gray-200 min-h-[48px]">
+                  <label htmlFor="email" className="block text-sm font-semibold text-gray-900 text-left">Email</label>
+                  <div id="email" className="flex items-center gap-3 py-3 px-4 bg-gray-50 rounded-lg text-gray-600 border border-gray-200 min-h-[48px]">
                     <Mail className="h-4 w-4 text-gray-500" />
                     <span className="text-gray-900">{formData.email}</span>
                   </div>
                 </div>
                 
                 <div className="space-y-3">
-                  <label className="block text-sm font-semibold text-gray-900 text-left">Téléphone</label>
+                  <label htmlFor="phone" className="block text-sm font-semibold text-gray-900 text-left">Téléphone</label>
                   {isEditing ? (
                     <Input
+                      id="phone"
                       value={formData.phone}
                       onChange={(e) => handleInputChange('phone', e.target.value)}
                       placeholder="Votre numéro de téléphone"
@@ -376,9 +380,10 @@ const ProfilePage: React.FC = () => {
                 </div>
                 
                 <div className="space-y-3 md:col-span-2">
-                  <label className="block text-sm font-semibold text-gray-900 text-left">Localisation</label>
+                  <label htmlFor="location" className="block text-sm font-semibold text-gray-900 text-left">Localisation</label>
                   {isEditing ? (
                     <Input
+                      id="location"
                       value={formData.location}
                       onChange={(e) => handleInputChange('location', e.target.value)}
                       placeholder="Votre ville"
@@ -393,9 +398,10 @@ const ProfilePage: React.FC = () => {
                 </div>
                 
                 <div className="space-y-3">
-                  <label className="block text-sm font-semibold text-gray-900 text-left">Site web</label>
+                  <label htmlFor="website" className="block text-sm font-semibold text-gray-900 text-left">Site web</label>
                   {isEditing ? (
                     <Input
+                      id="website"
                       value={formData.website}
                       onChange={(e) => handleInputChange('website', e.target.value)}
                       placeholder="https://votre-site.com"
@@ -415,9 +421,10 @@ const ProfilePage: React.FC = () => {
                 </div>
                 
                 <div className="space-y-3">
-                  <label className="block text-sm font-semibold text-gray-900 text-left">Date de naissance</label>
+                  <label htmlFor="dateOfBirth" className="block text-sm font-semibold text-gray-900 text-left">Date de naissance</label>
                   {isEditing ? (
                     <Input
+                      id="dateOfBirth"
                       type="date"
                       value={formData.dateOfBirth}
                       onChange={(e) => handleInputChange('dateOfBirth', e.target.value)}
@@ -433,9 +440,10 @@ const ProfilePage: React.FC = () => {
               </div>
               
               <div className="mt-8 space-y-3">
-                <label className="block text-sm font-semibold text-gray-900 text-left">Bio</label>
+                <label htmlFor="bio" className="block text-sm font-semibold text-gray-900 text-left">Bio</label>
                 {isEditing ? (
                   <textarea
+                    id="bio"
                     value={formData.bio}
                     onChange={(e) => handleInputChange('bio', e.target.value)}
                     placeholder="Parlez-nous de vous..."
@@ -453,9 +461,9 @@ const ProfilePage: React.FC = () => {
               <div className="mt-8 space-y-3">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="p-2 bg-blue-50 rounded-lg">
-                    <Link className="h-5 w-5 text-blue-600" />
+                    <LinkIcon className="h-5 w-5 text-blue-600" />
                   </div>
-                  <label className="block text-sm font-semibold text-gray-900">Liens sociaux</label>
+                  <h3 className="block text-sm font-semibold text-gray-900 text-left">Liens sociaux</h3>
                 </div>
                 <SocialLinksManager
                    socialLinks={formData.socialLinks}
@@ -471,13 +479,34 @@ const ProfilePage: React.FC = () => {
             {/* Profile Completion Indicator */}
             <ProfileCompletionIndicator user={user} />
             
+            {/* Quick Actions Card */}
+            <div className="bg-gradient-to-br from-red-50 to-red-100 rounded-2xl shadow-sm border border-red-200 p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 bg-red-500 rounded-lg">
+                  <Plus className="h-5 w-5 text-white" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 text-left">Action rapide</h3>
+              </div>
+              
+              <p className="text-sm text-gray-700 mb-4">
+                Vous avez quelque chose à vendre ? Publiez votre annonce en quelques clics !
+              </p>
+              
+              <Link to="/publier">
+                <Button className="w-full bg-red-600 hover:bg-red-700 text-white flex items-center justify-center gap-2">
+                  <Plus className="h-4 w-4" />
+                  Publier une annonce
+                </Button>
+              </Link>
+            </div>
+
             {/* Account Settings Card */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
               <div className="flex items-center gap-3 mb-6">
                 <div className="p-2 bg-gray-50 rounded-lg">
                   <Settings className="h-5 w-5 text-gray-600" />
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900">Paramètres</h3>
+                <h3 className="text-lg font-semibold text-gray-900 text-left">Paramètres</h3>
               </div>
               
               <div className="space-y-2">
@@ -502,7 +531,7 @@ const ProfilePage: React.FC = () => {
                 <div className="p-2 bg-green-50 rounded-lg">
                   <Activity className="h-5 w-5 text-green-600" />
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900">Activité</h3>
+                <h3 className="text-lg font-semibold text-gray-900 text-left">Activité</h3>
               </div>
               
               <div className="space-y-4">

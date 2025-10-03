@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Facebook, Twitter, Instagram, Mail, Phone, MapPin } from 'lucide-react';
 
 const Footer: React.FC = () => {
@@ -44,7 +45,7 @@ const Footer: React.FC = () => {
           <div className="space-y-4">
             <h3 className="text-white text-lg font-semibold">Services</h3>
             <ul className="space-y-2 text-sm">
-              <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Publier une annonce</a></li>
+              <li><Link to="/publier" className="text-gray-300 hover:text-white transition-colors">Publier une annonce</Link></li>
               <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Promouvoir mon annonce</a></li>
               <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Boutique professionnelle</a></li>
               <li><a href="#" className="text-gray-300 hover:text-white transition-colors">API Grabi</a></li>

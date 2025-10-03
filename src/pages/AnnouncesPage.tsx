@@ -85,8 +85,9 @@ const AnnouncesPage: React.FC = () => {
   });
 
   const ListingCard: React.FC<{ listing: Listing }> = ({ listing }) => (
-    <div className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer group">
-      <div className="relative h-48 overflow-hidden">
+    <div className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow cursor-pointer group flex flex-col h-full">
+      {/* Product Image */}
+      <div className="relative h-76 overflow-hidden">
         <img
           src={listing.image}
           alt={listing.title}
@@ -107,36 +108,33 @@ const AnnouncesPage: React.FC = () => {
           )}
         </div>
 
-        {/* Time badge */}
+        {/* Date Badge */}
         <div className="absolute bottom-3 left-3">
           <span className="bg-black/60 text-white px-2 py-1 rounded-full text-xs font-medium backdrop-blur-sm">
             {formatTimeAgo(listing.createdAt)}
           </span>
         </div>
 
-        {/* Heart icon */}
+        {/* Heart Icon */}
         <button className="absolute top-3 right-3 bg-white/90 hover:bg-white rounded-full p-2 transition-colors">
           <Heart className="h-4 w-4 text-gray-600 hover:text-red-500" />
         </button>
       </div>
 
-      <div className="p-4">
-        <h3 className="text-sm font-medium text-gray-900 mb-2 line-clamp-2">
+      {/* Product Info */}
+      <div className="p-4 flex flex-col flex-grow">
+        <h3 className="text-sm font-medium text-gray-900 mb-2 line-clamp-2 text-left">
           {listing.title}
         </h3>
         
         <div className="flex items-center justify-between mb-3">
-          <span className="text-lg font-bold text-gray-900">
-            {formatPrice(listing.price, listing.currency)}
+          <span className="text-xl font-bold text-gray-900">
+            {listing.price.toLocaleString()} {listing.currency}
           </span>
         </div>
 
-        <div className="flex items-center text-sm text-gray-500 mb-3">
-          <MapPin className="h-4 w-4 mr-1" />
-          {listing.location}
-        </div>
-
-        <div className="flex items-center justify-between">
+        {/* User Info - Fixed at bottom */}
+        <div className="flex items-center justify-between mt-auto">
           <div className="flex items-center">
             <img
               src={listing.user.avatar || '/default-avatar.svg'}
@@ -215,11 +213,11 @@ const AnnouncesPage: React.FC = () => {
       {/* Hero Section */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
               Toutes les annonces
             </h1>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <p className="text-lg text-gray-600 max-w-3xl">
               Découvrez des milliers d'annonces dans toutes les catégories. 
               Trouvez exactement ce que vous cherchez au meilleur prix.
             </p>

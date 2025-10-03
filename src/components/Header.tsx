@@ -280,10 +280,12 @@ const Header: React.FC = () => {
                     <span className="hidden lg:inline">Annonces</span>
                   </Button>
                 </Link>
-                <Button variant="ghost" className="text-gray-600 hover:text-gray-800 font-normal">
-                  <Plus className="h-4 w-4 mr-1" />
-                  <span className="hidden lg:inline">Publier</span>
-                </Button>
+                <Link to="/publier">
+                  <Button variant="ghost" className="text-gray-600 hover:text-gray-800 font-normal">
+                    <Plus className="h-4 w-4 mr-1" />
+                    <span className="hidden lg:inline">Publier</span>
+                  </Button>
+                </Link>
                 
                 {/* User Profile or Login */}
                 {user ? (
@@ -373,12 +375,21 @@ const Header: React.FC = () => {
 
       {/* Mobile Menu Overlay */}
       {showMobileMenu && (
-        <div className="md:hidden fixed inset-0 z-50" onClick={() => setShowMobileMenu(false)}>
+        <div className="md:hidden fixed inset-0 z-50">
           {/* Backdrop with blur effect - using backdrop-blur and lower opacity */}
-          <div className="absolute inset-0 bg-white/10 backdrop-blur-md backdrop-brightness-75"></div>
+          <button
+            className="absolute inset-0 bg-white/10 backdrop-blur-md backdrop-brightness-75 w-full h-full"
+            onClick={() => setShowMobileMenu(false)}
+            aria-label="Fermer le menu"
+            tabIndex={-1}
+          />
           
           {/* Mobile Menu Panel - slides from right */}
-          <div className="absolute right-0 top-0 bg-white w-64 h-full shadow-xl transform transition-transform duration-300 ease-in-out" onClick={(e) => e.stopPropagation()}>
+          <aside 
+            className="absolute right-0 top-0 bg-white w-64 h-full shadow-xl transform transition-transform duration-300 ease-in-out" 
+            role="dialog"
+            aria-label="Menu mobile"
+          >
             <div className="p-4 border-b border-gray-200">
               <div className="flex items-center justify-between">
                 <img src="/logo.svg" alt="Grabi" className="h-8 w-auto" />
@@ -486,7 +497,7 @@ const Header: React.FC = () => {
                 </Link>
               </div>
             </div>
-          </div>
+          </aside>
         </div>
       )}
 
@@ -563,6 +574,7 @@ const Header: React.FC = () => {
             onMouseEnter={handleMegaMenuEnter}
             onMouseLeave={handleMegaMenuLeave}
             role="menu"
+            tabIndex={-1}
             aria-label={`Sous-catégories de ${currentCategory.name}`}
           >
             <div className="p-6">
@@ -574,10 +586,10 @@ const Header: React.FC = () => {
                   </span>
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900">
+                  <h3 className="text-lg font-semibold text-gray-900 text-left">
                     {currentCategory.name}
                   </h3>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-gray-500 text-left">
                     {getCategoryDescription(currentCategory.name)}
                   </p>
                 </div>
