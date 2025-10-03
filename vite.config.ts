@@ -83,4 +83,19 @@ export default defineConfig({
       "@": fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  server: {
+    proxy: {
+      '/api/wave': {
+        target: 'https://api.wave.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/wave/, ''),
+        configure: (proxy) => {
+          proxy.on('proxyReq', (proxyReq) => {
+            // Add the Wave API key to the request
+            proxyReq.setHeader('Authorization', `Bearer ${process.env.VITE_WAVE_API_KEY}`);
+          });
+        },
+      },
+    },
+  },
 })

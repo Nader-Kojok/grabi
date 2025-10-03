@@ -35,16 +35,11 @@ interface WaveApiResponse<T> {
 }
 
 class WaveService {
-  private readonly apiKey: string;
   private readonly baseUrl: string;
 
   constructor() {
-    this.apiKey = import.meta.env.VITE_WAVE_API_KEY;
-    this.baseUrl = import.meta.env.VITE_WAVE_BASE_URL;
-
-    if (!this.apiKey) {
-      throw new Error('Wave API key is not configured');
-    }
+    // Use the Vite proxy for development, direct API for production
+    this.baseUrl = import.meta.env.DEV ? '/api/wave' : 'https://api.wave.com';
   }
 
   /**
@@ -57,7 +52,6 @@ class WaveService {
       const response = await fetch(`${this.baseUrl}/v1/checkout/sessions`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(params),
@@ -106,7 +100,6 @@ class WaveService {
       const response = await fetch(`${this.baseUrl}/v1/checkout/sessions/${sessionId}`, {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
           'Content-Type': 'application/json',
         },
       });
