@@ -190,6 +190,33 @@ const PublishPage: React.FC = () => {
     }
 
     try {
+      // First, upload images to Supabase Storage
+      console.log('Uploading images before payment...');
+      const imageUrls: string[] = [];
+      
+      for (let i = 0; i < images.length; i++) {
+        const file = images[i];
+        const fileExt = file.name.split('.').pop();
+        const fileName = `temp_${Date.now()}_${i}.${fileExt}`;
+        
+        const { error: uploadError } = await supabase.storage
+          .from('listings')
+          .upload(fileName, file);
+
+        if (uploadError) {
+          console.error('Upload error:', uploadError);
+          throw new Error(`Erreur lors de l'upload de l'image ${i + 1}: ${uploadError.message}`);
+        }
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('listings')
+          .getPublicUrl(fileName);
+
+        imageUrls.push(publicUrl);
+      }
+
+      console.log('Images uploaded successfully:', imageUrls);
+
       // Create Wave checkout session for listing publication fee
       const listingPrice = waveService.getListingPrice();
       
@@ -202,7 +229,7 @@ const PublishPage: React.FC = () => {
         location: formData.location,
         condition: formData.condition,
         phone: formData.phone,
-        images: images
+        images: imageUrls // Store URLs instead of File objects
       };
 
       // Create Wave checkout session

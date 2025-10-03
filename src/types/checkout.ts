@@ -26,7 +26,7 @@ export interface ListingFormData {
   location: string;
   condition: string;
   phone: string;
-  images: File[];
+  images: string[]; // Changed from File[] to string[] (URLs)
 }
 
 export interface CreateCheckoutRequest {

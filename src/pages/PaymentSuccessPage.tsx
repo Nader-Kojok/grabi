@@ -134,26 +134,16 @@ const PaymentSuccessPage: React.FC = () => {
 
   const createListing = async (listingData: any) => {
     try {
-      // Upload images to Supabase Storage
-      const imageUrls: string[] = [];
+      console.log('Creating listing with data:', listingData);
       
-      for (let i = 0; i < listingData.images.length; i++) {
-        const file = listingData.images[i];
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${Date.now()}-${i}.${fileExt}`;
-        
-        const { error: uploadError } = await supabase.storage
-          .from('listings')
-          .upload(fileName, file);
-
-        if (uploadError) throw uploadError;
-
-        const { data: { publicUrl } } = supabase.storage
-          .from('listings')
-          .getPublicUrl(fileName);
-
-        imageUrls.push(publicUrl);
+      // Check if images exist and are valid
+      if (!listingData.images || !Array.isArray(listingData.images)) {
+        throw new Error('Aucune image trouvée dans les données de l\'annonce');
       }
+
+      // Images are already uploaded and we have URLs
+      const imageUrls = listingData.images;
+      console.log('Using pre-uploaded images:', imageUrls);
 
       // Create listing in database
       const { error: insertError } = await supabase
