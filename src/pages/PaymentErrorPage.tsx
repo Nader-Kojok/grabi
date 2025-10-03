@@ -65,7 +65,7 @@ const PaymentErrorPage: React.FC = () => {
         .select('*')
         .eq('wave_session_id', sessionId)
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       console.log('Database query result:', { checkoutSession, dbError });
 

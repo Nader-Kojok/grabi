@@ -48,7 +48,7 @@ const PaymentSuccessPage: React.FC = () => {
         .select('*')
         .eq('wave_session_id', sessionId)
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       console.log('Database query result:', { checkoutSession, dbError });
 
@@ -65,7 +65,12 @@ const PaymentSuccessPage: React.FC = () => {
           .eq('wave_session_id', sessionId);
         
         console.log('Any session found:', anySession);
-        throw new Error('Session de paiement introuvable pour cet utilisateur');
+        
+        if (anySession && anySession.length > 0) {
+          throw new Error(`Session trouvée mais appartient à un autre utilisateur. Session user: ${anySession[0].user_id}, Current user: ${user.id}`);
+        } else {
+          throw new Error('Session de paiement introuvable dans la base de données');
+        }
       }
 
       // 2. Verify payment status with Wave API
