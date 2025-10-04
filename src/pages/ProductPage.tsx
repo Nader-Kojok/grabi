@@ -239,7 +239,7 @@ N'hésitez pas à me contacter pour plus d'informations ou pour organiser une vi
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Breadcrumb et navigation */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-4 sm:mb-6">
           <button
             onClick={() => navigate(-1)}
             className="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
@@ -248,7 +248,7 @@ N'hésitez pas à me contacter pour plus d'informations ou pour organiser une vi
             <span className="text-sm font-medium text-left">Retour</span>
           </button>
           
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-2 sm:space-x-3">
             <button
               onClick={() => setIsLiked(!isLiked)}
               className={`p-2 rounded-full transition-colors ${
@@ -256,29 +256,31 @@ N'hésitez pas à me contacter pour plus d'informations ou pour organiser une vi
                   ? 'bg-red-100 text-red-600' 
                   : 'bg-white text-gray-600 hover:bg-gray-100'
               }`}
+              aria-label="Ajouter aux favoris"
             >
-              <Heart className={`h-5 w-5 ${isLiked ? 'fill-current' : ''}`} />
+              <Heart className={`h-4 w-4 sm:h-5 sm:w-5 ${isLiked ? 'fill-current' : ''}`} />
             </button>
             
             <button
               onClick={handleShare}
               className="p-2 rounded-full bg-white text-gray-600 hover:bg-gray-100 transition-colors"
+              aria-label="Partager"
             >
-              <Share2 className="h-5 w-5" />
+              <Share2 className="h-4 w-4 sm:h-5 sm:w-5" />
             </button>
             
-            <button className="p-2 rounded-full bg-white text-gray-600 hover:bg-gray-100 transition-colors">
-              <Flag className="h-5 w-5" />
+            <button className="p-2 rounded-full bg-white text-gray-600 hover:bg-gray-100 transition-colors" aria-label="Signaler">
+              <Flag className="h-4 w-4 sm:h-5 sm:w-5" />
             </button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
           {/* Galerie d'images */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-xl overflow-hidden shadow-sm">
               {/* Image principale */}
-              <div className="relative h-96 md:h-[500px] bg-gray-100">
+              <div className="relative h-64 sm:h-96 md:h-[500px] bg-gray-100">
                 <img
                   src={productImages[currentImageIndex]}
                   alt={listing ? listing.title : mockProduct.title}
@@ -336,8 +338,8 @@ N'hésitez pas à me contacter pour plus d'informations ou pour organiser une vi
               
               {/* Miniatures */}
               {productImages.length > 1 && (
-                <div className="p-4 border-t">
-                  <div className="flex space-x-3 overflow-x-auto">
+                <div className="p-3 sm:p-4 border-t">
+                  <div className="flex space-x-2 sm:space-x-3 overflow-x-auto pb-2">
                     {productImages.map((image, index) => {
                       const uniqueKey = `thumbnail-${listing?.id || mockProduct.id}-${index}`;
                       const title = listing ? listing.title : mockProduct.title;
@@ -345,7 +347,7 @@ N'hésitez pas à me contacter pour plus d'informations ou pour organiser une vi
                         <button
                           key={uniqueKey}
                           onClick={() => setCurrentImageIndex(index)}
-                          className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-colors ${
+                          className={`flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden border-2 transition-colors ${
                             index === currentImageIndex 
                               ? 'border-red-500' 
                               : 'border-gray-200 hover:border-gray-300'
@@ -366,15 +368,15 @@ N'hésitez pas à me contacter pour plus d'informations ou pour organiser une vi
           </div>
 
           {/* Informations produit */}
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {/* Prix et titre */}
-            <div className="bg-white rounded-xl p-6 shadow-sm">
+            <div className="bg-white rounded-xl p-4 sm:p-6 shadow-sm">
               <div className="flex items-start justify-between mb-4">
-                <div>
-                  <h1 className="text-2xl font-bold text-gray-900 mb-2 text-left">
+                <div className="min-w-0 flex-1">
+                  <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 text-left">
                     {listing ? listing.title : mockProduct.title}
                   </h1>
-                  <p className="text-3xl font-bold text-red-600 text-left">
+                  <p className="text-2xl sm:text-3xl font-bold text-red-600 text-left">
                     {formatCurrency(listing ? listing.price : mockProduct.price)}
                   </p>
                 </div>
@@ -398,8 +400,8 @@ N'hésitez pas à me contacter pour plus d'informations ou pour organiser une vi
             </div>
 
             {/* Informations vendeur */}
-            <div className="bg-white rounded-xl p-6 shadow-sm">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 text-left">
+            <div className="bg-white rounded-xl p-4 sm:p-6 shadow-sm">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4 text-left">
                 Vendeur
               </h3>
               
@@ -407,9 +409,9 @@ N'hésitez pas à me contacter pour plus d'informations ou pour organiser une vi
                 <img
                   src={listing?.profile?.avatar_url || mockProduct.user?.avatar || '/default-avatar.svg'}
                   alt={listing?.profile ? `${listing.profile.first_name} ${listing.profile.last_name}` : mockProduct.user?.name || 'Vendeur'}
-                  className="w-12 h-12 rounded-full mr-4"
+                  className="w-10 h-10 sm:w-12 sm:h-12 rounded-full mr-3 sm:mr-4"
                 />
-                <div className="flex-1">
+                <div className="flex-1 min-w-0">
                   <h4 className="font-semibold text-gray-900 text-left">
                     {listing?.profile 
                       ? `${listing.profile.first_name} ${listing.profile.last_name}` 
@@ -437,27 +439,27 @@ N'hésitez pas à me contacter pour plus d'informations ou pour organiser une vi
                 <span className="text-left">Profil vérifié</span>
               </div>
               
-              <div className="space-y-3">
-                <button className="w-full bg-red-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-red-700 transition-colors">
-                  <MessageCircle className="h-5 w-5 inline mr-2" />
+              <div className="space-y-2 sm:space-y-3">
+                <button className="w-full bg-red-600 text-white py-2.5 sm:py-3 px-4 rounded-lg text-sm sm:text-base font-medium hover:bg-red-700 transition-colors">
+                  <MessageCircle className="h-4 w-4 sm:h-5 sm:w-5 inline mr-2" />
                   Contacter le vendeur
                 </button>
-                <button className="w-full bg-gray-100 text-gray-900 py-3 px-4 rounded-lg font-medium hover:bg-gray-200 transition-colors">
-                  <Phone className="h-5 w-5 inline mr-2" />
+                <button className="w-full bg-gray-100 text-gray-900 py-2.5 sm:py-3 px-4 rounded-lg text-sm sm:text-base font-medium hover:bg-gray-200 transition-colors">
+                  <Phone className="h-4 w-4 sm:h-5 sm:w-5 inline mr-2" />
                   Afficher le numéro
                 </button>
               </div>
             </div>
 
             {/* Sécurité */}
-            <div className="bg-blue-50 rounded-xl p-4">
+            <div className="bg-blue-50 rounded-xl p-3 sm:p-4">
               <div className="flex items-start">
-                <Shield className="h-5 w-5 text-blue-600 mr-3 mt-0.5" />
-                <div>
-                  <h4 className="font-semibold text-blue-900 text-left">
+                <Shield className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 mr-2 sm:mr-3 mt-0.5 flex-shrink-0" />
+                <div className="min-w-0">
+                  <h4 className="text-sm sm:text-base font-semibold text-blue-900 text-left">
                     Conseils de sécurité
                   </h4>
-                  <p className="text-sm text-blue-800 mt-1 text-left">
+                  <p className="text-xs sm:text-sm text-blue-800 mt-1 text-left">
                     Rencontrez le vendeur en personne et vérifiez l'article avant l'achat.
                   </p>
                 </div>
@@ -467,8 +469,8 @@ N'hésitez pas à me contacter pour plus d'informations ou pour organiser une vi
         </div>
 
         {/* Description détaillée */}
-        <div className="mt-8 bg-white rounded-xl p-6 shadow-sm">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4 text-left">
+        <div className="mt-6 sm:mt-8 bg-white rounded-xl p-4 sm:p-6 shadow-sm">
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4 text-left">
             Description
           </h2>
           
@@ -492,8 +494,8 @@ N'hésitez pas à me contacter pour plus d'informations ou pour organiser une vi
         </div>
 
         {/* Évaluations du vendeur */}
-        <div className="mt-8 bg-white rounded-xl p-6 shadow-sm">
-          <h2 className="text-xl font-semibold text-gray-900 mb-6 text-left">
+        <div className="mt-6 sm:mt-8 bg-white rounded-xl p-4 sm:p-6 shadow-sm">
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4 sm:mb-6 text-left">
             Évaluations du vendeur
           </h2>
           

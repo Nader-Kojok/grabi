@@ -143,15 +143,17 @@ const PaymentErrorPage: React.FC = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
         <Header />
-        <div className="container mx-auto px-4 py-16 max-w-2xl">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4"></div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2 text-left">
-              Vérification du paiement...
-            </h1>
-            <p className="text-gray-600 text-left">
-              Nous vérifions le statut de votre paiement.
-            </p>
+        <div className="container mx-auto px-4 py-8 sm:py-16 max-w-2xl">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sm:p-8">
+            <div className="flex flex-col items-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mb-4"></div>
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 text-center">
+                Vérification du paiement...
+              </h1>
+              <p className="text-sm sm:text-base text-gray-600 text-center">
+                Nous vérifions le statut de votre paiement.
+              </p>
+            </div>
           </div>
         </div>
         <Footer />
@@ -163,20 +165,20 @@ const PaymentErrorPage: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <Header />
       
-      <div className="container mx-auto px-4 py-16 max-w-2xl">
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+      <div className="container mx-auto px-4 py-8 sm:py-16 max-w-2xl">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sm:p-8">
           {/* Error Icon */}
-          <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
-            <AlertCircle className="w-12 h-12 text-red-600" />
-          </div>
+          <div className="flex flex-col items-center text-center">
+            <div className="w-16 sm:w-20 h-16 sm:h-20 bg-red-50 rounded-full flex items-center justify-center mb-6">
+              <AlertCircle className="w-10 sm:w-12 h-10 sm:h-12 text-red-600" />
+            </div>
 
-          {/* Error Message */}
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-4 text-left">
+            {/* Error Message */}
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
               {errorDetails.title}
             </h1>
             
-            <p className="text-lg text-gray-600 mb-6 text-left">
+            <p className="text-base sm:text-lg text-gray-600 mb-6">
               {errorDetails.message}
             </p>
           </div>
@@ -186,7 +188,7 @@ const PaymentErrorPage: React.FC = () => {
             {errorDetails.canRetry && (
               <Button
                 onClick={handleRetry}
-                className="bg-red-600 hover:bg-red-700 text-white"
+                className="bg-red-600 hover:bg-red-700 text-white w-full sm:w-auto"
               >
                 <RefreshCw className="w-4 h-4 mr-2" />
                 Réessayer
@@ -196,6 +198,7 @@ const PaymentErrorPage: React.FC = () => {
             <Button
               onClick={() => navigate('/')}
               variant="outline"
+              className="w-full sm:w-auto"
             >
               <Home className="w-4 h-4 mr-2" />
               Retour à l'accueil

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Upload, X, MapPin, Tag, DollarSign, FileText, Image as ImageIcon, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Upload, X, MapPin, Tag, DollarSign, FileText, Image as ImageIcon } from 'lucide-react';
+import { toast } from 'sonner';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import Header from '../components/Header';
@@ -25,7 +26,6 @@ const PublishPage: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
   const [categories, setCategories] = useState<CategoryWithSubs[]>([]);
   const [loadingCategories, setLoadingCategories] = useState(true);
   
@@ -72,7 +72,7 @@ const PublishPage: React.FC = () => {
         }
       } catch (err) {
         console.error('Error fetching categories:', err);
-        setError('Erreur lors du chargement des catégories');
+        toast.error('Erreur lors du chargement des catégories');
       } finally {
         setLoadingCategories(false);
       }
@@ -107,24 +107,23 @@ const PublishPage: React.FC = () => {
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-    setError('');
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     
     if (images.length + files.length > 8) {
-      setError('Vous ne pouvez télécharger que 8 images maximum');
+      toast.error('Vous ne pouvez télécharger que 8 images maximum');
       return;
     }
 
     const validFiles = files.filter(file => {
       if (!file.type.startsWith('image/')) {
-        setError('Seules les images sont acceptées');
+        toast.error('Seules les images sont acceptées');
         return false;
       }
       if (file.size > 5 * 1024 * 1024) {
-        setError('Chaque image doit faire moins de 5 MB');
+        toast.error('Chaque image doit faire moins de 5 MB');
         return false;
       }
       return true;
@@ -150,41 +149,40 @@ const PublishPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError('');
 
     // Validation
     if (!formData.title.trim()) {
-      setError('Le titre est requis');
+      toast.error('Le titre est requis');
       setIsLoading(false);
       return;
     }
 
     if (!formData.description.trim()) {
-      setError('La description est requise');
+      toast.error('La description est requise');
       setIsLoading(false);
       return;
     }
 
     if (!formData.price || parseFloat(formData.price) <= 0) {
-      setError('Le prix doit être supérieur à 0');
+      toast.error('Le prix doit être supérieur à 0');
       setIsLoading(false);
       return;
     }
 
     if (!formData.category) {
-      setError('Veuillez sélectionner une catégorie');
+      toast.error('Veuillez sélectionner une catégorie');
       setIsLoading(false);
       return;
     }
 
     if (!formData.location.trim()) {
-      setError('La localisation est requise');
+      toast.error('La localisation est requise');
       setIsLoading(false);
       return;
     }
 
     if (images.length === 0) {
-      setError('Veuillez ajouter au moins une image');
+      toast.error('Veuillez ajouter au moins une image');
       setIsLoading(false);
       return;
     }
@@ -297,7 +295,7 @@ const PublishPage: React.FC = () => {
       
     } catch (error) {
       console.error('Payment error:', error);
-      setError(error instanceof Error ? error.message : 'Une erreur est survenue lors de la création du paiement');
+      toast.error(error instanceof Error ? error.message : 'Une erreur est survenue lors de la création du paiement');
     } finally {
       setIsLoading(false);
     }
@@ -307,39 +305,39 @@ const PublishPage: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <Header />
       
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <div className="container mx-auto px-4 py-6 sm:py-8 max-w-4xl">
         {/* Back Button */}
         <Button
           variant="outline"
           onClick={() => navigate(-1)}
-          className="mb-6 flex items-center gap-2 hover:bg-white transition-colors border-gray-300"
+          className="mb-4 sm:mb-6 flex items-center gap-2 hover:bg-white transition-colors border-gray-300"
         >
           <ArrowLeft className="h-4 w-4" />
           Retour
         </Button>
 
         {/* Page Header */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 mb-8">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8">
           <div className="text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-red-50 rounded-full mb-4">
-              <Upload className="h-8 w-8 text-red-600" />
+            <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-red-50 rounded-full mb-4">
+              <Upload className="h-6 w-6 sm:h-8 sm:w-8 text-red-600" />
             </div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
               Publier une annonce
             </h1>
-            <p className="text-gray-600 mb-3">
+            <p className="text-sm sm:text-base text-gray-600 mb-3">
               Remplissez les informations ci-dessous pour publier votre annonce
             </p>
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <div className="flex items-center gap-3">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4">
+              <div className="flex items-start sm:items-center gap-2 sm:gap-3">
                 <div className="flex-shrink-0">
-                  <DollarSign className="h-5 w-5 text-blue-600" />
+                  <DollarSign className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
                 </div>
-                <div>
-                  <p className="text-sm font-medium text-blue-900 text-left">
+                <div className="text-left">
+                  <p className="text-xs sm:text-sm font-medium text-blue-900">
                     Frais de publication : 500 F CFA
                   </p>
-                  <p className="text-xs text-blue-700 text-left">
+                  <p className="text-xs text-blue-700">
                     Paiement sécurisé via Wave • Annonce active immédiatement après paiement
                   </p>
                 </div>
@@ -348,35 +346,26 @@ const PublishPage: React.FC = () => {
           </div>
         </div>
 
-
-        {/* Error Message */}
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-lg mb-6 flex items-center gap-3">
-            <AlertCircle className="h-5 w-5 flex-shrink-0" />
-            <p>{error}</p>
-          </div>
-        )}
-
         {/* Form */}
-        <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+        <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 sm:p-6 lg:p-8">
           {/* Images Section */}
-          <div className="mb-8">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 bg-blue-50 rounded-lg">
-                <ImageIcon className="h-5 w-5 text-blue-600" />
+          <div className="mb-6 sm:mb-8">
+            <div className="flex items-start sm:items-center gap-2 sm:gap-3 mb-4">
+              <div className="p-2 bg-blue-50 rounded-lg flex-shrink-0">
+                <ImageIcon className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
               </div>
-              <div>
-                <h3 className="block text-lg font-semibold text-gray-900 text-left">
+              <div className="min-w-0">
+                <h3 className="block text-base sm:text-lg font-semibold text-gray-900 text-left">
                   Photos de l'annonce
                 </h3>
-                <p className="text-sm text-gray-500 text-left">
+                <p className="text-xs sm:text-sm text-gray-500 text-left">
                   Ajoutez jusqu'à 8 photos (5 MB max par image)
                 </p>
               </div>
             </div>
 
             {/* Image Upload Area */}
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-red-400 transition-colors">
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 sm:p-6 text-center hover:border-red-400 transition-colors">
               <input
                 type="file"
                 id="image-upload"
@@ -387,8 +376,8 @@ const PublishPage: React.FC = () => {
               />
               <label htmlFor="image-upload" className="cursor-pointer">
                 <div className="flex flex-col items-center">
-                  <Upload className="h-12 w-12 text-gray-400 mb-3" />
-                  <p className="text-sm font-medium text-gray-700 mb-1">
+                  <Upload className="h-10 w-10 sm:h-12 sm:w-12 text-gray-400 mb-3" />
+                  <p className="text-xs sm:text-sm font-medium text-gray-700 mb-1">
                     Cliquez pour télécharger des images
                   </p>
                   <p className="text-xs text-gray-500">
@@ -427,12 +416,12 @@ const PublishPage: React.FC = () => {
           </div>
 
           {/* Basic Information */}
-          <div className="mb-8">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="p-2 bg-purple-50 rounded-lg">
-                <FileText className="h-5 w-5 text-purple-600" />
+          <div className="mb-6 sm:mb-8">
+            <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+              <div className="p-2 bg-purple-50 rounded-lg flex-shrink-0">
+                <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600" />
               </div>
-              <h2 className="text-lg font-semibold text-gray-900 text-left">
+              <h2 className="text-base sm:text-lg font-semibold text-gray-900 text-left">
                 Informations de base
               </h2>
             </div>
@@ -612,23 +601,24 @@ const PublishPage: React.FC = () => {
           </div>
 
           {/* Submit Button */}
-          <div className="flex items-center justify-between pt-6 border-t border-gray-200">
-            <p className="text-sm text-gray-500">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-6 border-t border-gray-200">
+            <p className="text-xs sm:text-sm text-gray-500">
               * Champs obligatoires
             </p>
-            <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => navigate(-1)}
                 disabled={isLoading}
+                className="w-full sm:w-auto"
               >
                 Annuler
               </Button>
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="bg-red-600 hover:bg-red-700 text-white px-8"
+                className="bg-red-600 hover:bg-red-700 text-white px-4 sm:px-8 w-full sm:w-auto text-sm sm:text-base"
               >
                 {isLoading ? 'Création du paiement...' : 'Payer et publier (500 F CFA)'}
               </Button>

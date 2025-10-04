@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, Edit, Save, X, UserCircle, Phone, MapPin, Calendar, Mail, Settings, Shield, Bell, CreditCard, Activity, Link as LinkIcon, Plus, Star } from 'lucide-react';
+import { toast } from 'sonner';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { FileUpload } from '../components/ui/file-upload';
@@ -20,7 +21,6 @@ const ProfilePage: React.FC = () => {
   const { user, updateUser } = useAuthStore();
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [activeTab, setActiveTab] = useState<'profile' | 'reviews'>('profile');
   
   const [formData, setFormData] = useState({
@@ -49,14 +49,15 @@ const ProfilePage: React.FC = () => {
       setTempAvatar(result.url);
       
       // Update user immediately
-      await updateUser({
+      setFormData(prev => ({
+        ...prev,
         avatar: result.url
-      });
+      }));
       
-      setMessage({ type: 'success', text: 'Avatar mis à jour avec succès!' });
+      toast.success('Avatar mis à jour avec succès!');
     } catch (error) {
       console.error('Avatar upload error:', error);
-      setMessage({ type: 'error', text: 'Erreur lors du téléchargement de l\'avatar' });
+      toast.error('Erreur lors du téléchargement de l\'avatar');
     } finally {
       setUploadingAvatar(false);
     }
@@ -71,19 +72,19 @@ const ProfilePage: React.FC = () => {
       setTempBanner(result.url);
       
       // Update user immediately
-      await updateUser({
+      setFormData(prev => ({
+        ...prev,
         bannerUrl: result.url
-      });
+      }));
       
-      setMessage({ type: 'success', text: 'Bannière mise à jour avec succès!' });
+      toast.success('Bannière mise à jour avec succès!');
     } catch (error) {
       console.error('Banner upload error:', error);
-      setMessage({ type: 'error', text: 'Erreur lors du téléchargement de la bannière' });
+      toast.error('Erreur lors du téléchargement de la bannière');
     } finally {
       setUploadingBanner(false);
     }
   };
-
   useEffect(() => {
     if (user) {
       const nameParts = user.name?.split(' ') || ['', ''];
@@ -113,7 +114,6 @@ const ProfilePage: React.FC = () => {
     if (!user) return;
     
     setIsLoading(true);
-    setMessage(null);
     
     try {
       const fullName = `${formData.firstName} ${formData.lastName}`.trim();
@@ -128,10 +128,10 @@ const ProfilePage: React.FC = () => {
       });
       
       setIsEditing(false);
-      setMessage({ type: 'success', text: 'Profil mis à jour avec succès!' });
+      toast.success('Profil mis à jour avec succès!');
     } catch (error) {
       console.error('Error updating profile:', error);
-      setMessage({ type: 'error', text: 'Erreur lors de la mise à jour du profil' });
+      toast.error('Erreur lors de la mise à jour du profil');
     } finally {
       setIsLoading(false);
     }
@@ -153,7 +153,6 @@ const ProfilePage: React.FC = () => {
       });
     }
     setIsEditing(false);
-    setMessage(null);
   };
 
   if (!user) {
@@ -299,19 +298,6 @@ const ProfilePage: React.FC = () => {
               </div>
             </div>
           </div>
-          
-          {/* Success/Error Messages - Only show container when there's a message */}
-          {message && (
-            <div className="px-8 pb-8 pt-6">
-              <div className={`p-4 rounded-lg ${
-                message.type === 'success' 
-                  ? 'bg-green-50 text-green-700 border border-green-200' 
-                  : 'bg-red-50 text-red-700 border border-red-200'
-              }`}>
-                {message.text}
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Tab Navigation */}

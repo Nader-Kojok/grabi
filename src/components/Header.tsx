@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Search, Menu, Plus, User, ChevronLeft, ChevronRight, Car, Home, Smartphone, Shirt, Wrench, Briefcase, MapPin, Baby, Hammer, Package, Settings, LogOut, UserCircle, ChevronDown } from 'lucide-react';
+import { Search, Menu, Plus, User, ChevronLeft, ChevronRight, Car, Home, Smartphone, Shirt, Wrench, Briefcase, MapPin, Baby, Hammer, Package, Settings, LogOut, UserCircle, ChevronDown, CreditCard } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -333,6 +333,14 @@ const Header: React.FC = () => {
                             Mes annonces
                           </Link>
                           <Link
+                            to="/mes-paiements"
+                            className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                            onClick={() => setShowUserDropdown(false)}
+                          >
+                            <CreditCard className="h-4 w-4 mr-3" />
+                            Mes paiements
+                          </Link>
+                          <Link
                             to="/settings"
                             className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                             onClick={() => setShowUserDropdown(false)}
@@ -469,6 +477,15 @@ const Header: React.FC = () => {
                   >
                     <Package className="h-5 w-5 text-gray-600" />
                     <span className="text-gray-800 font-medium">Mes annonces</span>
+                  </Link>
+                  
+                  <Link 
+                    to="/mes-paiements" 
+                    className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                    onClick={() => setShowMobileMenu(false)}
+                  >
+                    <CreditCard className="h-5 w-5 text-gray-600" />
+                    <span className="text-gray-800 font-medium">Mes paiements</span>
                   </Link>
                   
                   <Link 

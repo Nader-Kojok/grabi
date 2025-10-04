@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { CheckCircle, ArrowRight, Home, List } from 'lucide-react';
+import { toast } from 'sonner';
 import { Button } from '../components/ui/button';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -120,14 +121,25 @@ const PaymentSuccessPage: React.FC = () => {
 
       // 5. Create the listing if payment is successful
       if (checkoutSession.checkout_status !== 'complete') {
-        await createListing(checkoutSession.listing_data);
+        const listingId = await createListing(checkoutSession.listing_data);
         setListingCreated(true);
+        
+        // 6. Update checkout session with listing_id
+        if (listingId) {
+          await (supabase as any)
+            .from('checkout_sessions')
+            .update({ listing_id: listingId })
+            .eq('id', checkoutSession.id);
+        }
       }
 
       setIsProcessing(false);
+      toast.success('Annonce publiée avec succès !');
     } catch (err) {
       console.error('Error processing payment success:', err);
-      setError(err instanceof Error ? err.message : 'Une erreur est survenue');
+      const errorMessage = err instanceof Error ? err.message : 'Une erreur est survenue';
+      setError(errorMessage);
+      toast.error(errorMessage);
       setIsProcessing(false);
     }
   };
@@ -146,7 +158,7 @@ const PaymentSuccessPage: React.FC = () => {
       console.log('Using pre-uploaded images:', imageUrls);
 
       // Create listing in database
-      const { error: insertError } = await supabase
+      const { data: newListing, error: insertError } = await supabase
         .from('listings')
         .insert({
           title: listingData.title,
@@ -161,9 +173,17 @@ const PaymentSuccessPage: React.FC = () => {
           user_id: user!.id,
           images: imageUrls,
           status: 'active',
-        });
+        })
+        .select()
+        .single();
 
-      if (insertError) throw insertError;
+      if (insertError) {
+        console.error('Insert error:', insertError);
+        throw insertError;
+      }
+      
+      console.log('Listing created successfully:', newListing?.id);
+      return newListing?.id;
     } catch (err) {
       console.error('Error creating listing:', err);
       throw new Error('Erreur lors de la création de l\'annonce');
@@ -174,15 +194,17 @@ const PaymentSuccessPage: React.FC = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
         <Header />
-        <div className="container mx-auto px-4 py-16 max-w-2xl">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4"></div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2 text-left">
-              Traitement du paiement...
-            </h1>
-            <p className="text-gray-600 text-left">
-              Nous vérifions votre paiement et créons votre annonce.
-            </p>
+        <div className="container mx-auto px-4 py-8 sm:py-16 max-w-2xl">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sm:p-8">
+            <div className="flex flex-col items-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mb-4"></div>
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 text-center">
+                Traitement du paiement...
+              </h1>
+              <p className="text-sm sm:text-base text-gray-600 text-center">
+                Nous vérifions votre paiement et créons votre annonce.
+              </p>
+            </div>
           </div>
         </div>
         <Footer />
@@ -194,31 +216,34 @@ const PaymentSuccessPage: React.FC = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
         <Header />
-        <div className="container mx-auto px-4 py-16 max-w-2xl">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 text-center">
-            <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
-              <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-4 text-left">
-              Erreur de traitement
-            </h1>
-            <p className="text-red-600 mb-6 text-left">{error}</p>
-            <div className="flex gap-3 justify-center">
-              <Button
-                onClick={() => navigate('/publier')}
-                variant="outline"
-              >
-                Réessayer
-              </Button>
-              <Button
-                onClick={() => navigate('/')}
-                className="bg-red-600 hover:bg-red-700"
-              >
-                <Home className="w-4 h-4 mr-2" />
-                Accueil
-              </Button>
+        <div className="container mx-auto px-4 py-8 sm:py-16 max-w-2xl">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sm:p-8">
+            <div className="flex flex-col items-center text-center">
+              <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mb-6">
+                <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </div>
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">
+                Erreur de traitement
+              </h1>
+              <p className="text-sm sm:text-base text-red-600 mb-6">{error}</p>
+              <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                <Button
+                  onClick={() => navigate('/publier')}
+                  variant="outline"
+                  className="w-full sm:w-auto"
+                >
+                  Réessayer
+                </Button>
+                <Button
+                  onClick={() => navigate('/')}
+                  className="bg-red-600 hover:bg-red-700 w-full sm:w-auto"
+                >
+                  <Home className="w-4 h-4 mr-2" />
+                  Accueil
+                </Button>
+              </div>
             </div>
           </div>
         </div>
@@ -231,54 +256,57 @@ const PaymentSuccessPage: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <Header />
       
-      <div className="container mx-auto px-4 py-16 max-w-2xl">
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 text-center">
+      <div className="container mx-auto px-4 py-8 sm:py-16 max-w-2xl">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sm:p-8">
           {/* Success Icon */}
-          <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6">
-            <CheckCircle className="w-12 h-12 text-green-600" />
-          </div>
+          <div className="flex flex-col items-center text-center">
+            <div className="w-16 sm:w-20 h-16 sm:h-20 bg-green-50 rounded-full flex items-center justify-center mb-6">
+              <CheckCircle className="w-10 sm:w-12 h-10 sm:h-12 text-green-600" />
+            </div>
 
-          {/* Success Message */}
-          <h1 className="text-3xl font-bold text-gray-900 mb-4 text-left">
-            Paiement réussi !
-          </h1>
-          
-          <p className="text-lg text-gray-600 mb-2 text-left">
-            Votre paiement a été traité avec succès.
-          </p>
-          
-          {listingCreated && (
-            <p className="text-green-600 font-medium mb-6 text-left">
-              Votre annonce a été publiée et est maintenant visible sur la plateforme.
-            </p>
-          )}
-
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3 justify-center mt-8">
-            <Button
-              onClick={() => navigate('/mes-annonces')}
-              className="bg-red-600 hover:bg-red-700 text-white"
-            >
-              <List className="w-4 h-4 mr-2" />
-              Voir mes annonces
-            </Button>
+            {/* Success Message */}
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
+              Paiement réussi !
+            </h1>
             
-            <Button
-              onClick={() => navigate('/annonces')}
-              variant="outline"
-            >
-              Parcourir les annonces
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
-          </div>
-
-          {/* Additional Info */}
-          <div className="mt-8 p-4 bg-blue-50 rounded-lg">
-            <p className="text-sm text-blue-800 text-left">
-              <strong>Conseil :</strong> Vous recevrez des notifications lorsque des utilisateurs 
-              s'intéresseront à votre annonce. Assurez-vous que vos informations de contact 
-              sont à jour dans votre profil.
+            <p className="text-base sm:text-lg text-gray-600 mb-2">
+              Votre paiement a été traité avec succès.
             </p>
+            
+            {listingCreated && (
+              <p className="text-sm sm:text-base text-green-600 font-medium mb-6">
+                Votre annonce a été publiée et est maintenant visible sur la plateforme.
+              </p>
+            )}
+
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto mt-8">
+              <Button
+                onClick={() => navigate('/mes-annonces')}
+                className="bg-red-600 hover:bg-red-700 text-white w-full sm:w-auto"
+              >
+                <List className="w-4 h-4 mr-2" />
+                Voir mes annonces
+              </Button>
+              
+              <Button
+                onClick={() => navigate('/annonces')}
+                variant="outline"
+                className="w-full sm:w-auto"
+              >
+                Parcourir les annonces
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </div>
+
+            {/* Additional Info */}
+            <div className="mt-8 p-4 bg-blue-50 rounded-lg w-full">
+              <p className="text-xs sm:text-sm text-blue-800 text-left">
+                <strong>Conseil :</strong> Vous recevrez des notifications lorsque des utilisateurs 
+                s'intéresseront à votre annonce. Assurez-vous que vos informations de contact 
+                sont à jour dans votre profil.
+              </p>
+            </div>
           </div>
         </div>
       </div>

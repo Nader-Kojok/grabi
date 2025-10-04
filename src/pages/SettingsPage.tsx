@@ -19,8 +19,10 @@ import {
   MessageSquare,
   AlertCircle
 } from 'lucide-react';
+import { toast } from 'sonner';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
+import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { useAuthStore } from '../stores/authStore';
@@ -29,8 +31,9 @@ import { supabase } from '../lib/supabase';
 const SettingsPage: React.FC = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Security Settings
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
@@ -92,26 +95,25 @@ const SettingsPage: React.FC = () => {
 
   const handlePasswordChange = async () => {
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      setMessage({ type: 'error', text: 'Les mots de passe ne correspondent pas' });
+      toast.error('Les mots de passe ne correspondent pas');
       return;
     }
 
     if (passwordData.newPassword.length < 8) {
-      setMessage({ type: 'error', text: 'Le mot de passe doit contenir au moins 8 caractères' });
+      toast.error('Le mot de passe doit contenir au moins 8 caractères');
       return;
     }
 
     setIsLoading(true);
-    setMessage(null);
 
     try {
       // TODO: Implement password change logic with Supabase
       await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
-      setMessage({ type: 'success', text: 'Mot de passe modifié avec succès!' });
+      toast.success('Mot de passe modifié avec succès!');
       setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
     } catch (error) {
       console.error('Error changing password:', error);
-      setMessage({ type: 'error', text: 'Erreur lors du changement de mot de passe' });
+      toast.error('Erreur lors du changement de mot de passe');
     } finally {
       setIsLoading(false);
     }
@@ -119,19 +121,18 @@ const SettingsPage: React.FC = () => {
 
   const handleNotificationSave = () => {
     localStorage.setItem('notificationSettings', JSON.stringify(notificationSettings));
-    setMessage({ type: 'success', text: 'Préférences de notification enregistrées!' });
+    toast.success('Préférences de notification enregistrées!');
   };
 
   const handlePreferencesSave = () => {
     localStorage.setItem('userPreferences', JSON.stringify(preferences));
-    setMessage({ type: 'success', text: 'Préférences enregistrées!' });
+    toast.success('Préférences enregistrées!');
   };
 
   const handlePrivacySave = async () => {
     if (!user) return;
     
     setLoadingPrivacy(true);
-    setMessage(null);
 
     try {
       const { error } = await supabase
@@ -146,40 +147,36 @@ const SettingsPage: React.FC = () => {
 
       if (error) throw error;
 
-      setMessage({ type: 'success', text: 'Paramètres de confidentialité enregistrés!' });
+      toast.success('Paramètres de confidentialité enregistrés!');
       
       // Update the user in the auth store
       // This would require updating the auth store to refresh user data
       // For now, we'll just show the success message
     } catch (error) {
       console.error('Error updating privacy settings:', error);
-      setMessage({ type: 'error', text: 'Erreur lors de la sauvegarde des paramètres' });
+      toast.error('Erreur lors de la sauvegarde des paramètres');
     } finally {
       setLoadingPrivacy(false);
     }
   };
 
-  const handleDeleteAccount = async () => {
-    const confirmed = window.confirm(
-      'Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.'
-    );
+  const handleDeleteAccount = () => {
+    setDeleteDialogOpen(true);
+  };
 
-    if (!confirmed) return;
-
-    const doubleConfirm = window.confirm(
-      'Dernière confirmation : Toutes vos données seront définitivement supprimées. Continuer ?'
-    );
-
-    if (!doubleConfirm) return;
-
+  const confirmDeleteAccount = async () => {
     try {
+      setIsDeleting(true);
       // TODO: Implement account deletion logic
       await new Promise(resolve => setTimeout(resolve, 1000));
+      toast.success('Compte supprimé avec succès');
       await logout();
       navigate('/');
     } catch (error) {
       console.error('Error deleting account:', error);
-      setMessage({ type: 'error', text: 'Erreur lors de la suppression du compte' });
+      toast.error('Erreur lors de la suppression du compte');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -226,19 +223,6 @@ const SettingsPage: React.FC = () => {
               <p className="text-gray-600 mt-1">Gérez vos préférences et paramètres de compte</p>
             </div>
           </div>
-
-          {/* Success/Error Messages */}
-          {message && (
-            <div className="mt-6">
-              <div className={`p-4 rounded-lg ${
-                message.type === 'success' 
-                  ? 'bg-green-50 text-green-700 border border-green-200' 
-                  : 'bg-red-50 text-red-700 border border-red-200'
-              }`}>
-                {message.text}
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Main Content Grid */}
@@ -721,6 +705,19 @@ const SettingsPage: React.FC = () => {
           </div>
         </div>
       </div>
+      
+      {/* Delete Account Confirmation Dialog */}
+      <ConfirmationDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        title="Supprimer votre compte"
+        description="Êtes-vous absolument sûr ? Cette action est irréversible. Toutes vos données, annonces et informations seront définitivement supprimées."
+        confirmText="Oui, supprimer mon compte"
+        cancelText="Annuler"
+        onConfirm={confirmDeleteAccount}
+        variant="destructive"
+        isLoading={isDeleting}
+      />
       
       <Footer />
     </div>

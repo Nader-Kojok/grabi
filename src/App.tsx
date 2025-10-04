@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { useAuthStore } from './stores/authStore';
+import { Toaster } from './components/ui/toaster';
 import HomePage from './pages/HomePage';
 import AllCategoriesPage from './pages/AllCategoriesPage';
 import CategoryPage from './pages/CategoryPage';
@@ -17,6 +18,7 @@ import MyListingsPage from './pages/MyListingsPage';
 import SettingsPage from './pages/SettingsPage';
 import PaymentSuccessPage from './pages/PaymentSuccessPage';
 import PaymentErrorPage from './pages/PaymentErrorPage';
+import PaymentHistoryPage from './pages/PaymentHistoryPage';
 import './App.css';
 
 // Create a client
@@ -50,8 +52,10 @@ function App() {
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="/payment/success" element={<PaymentSuccessPage />} />
             <Route path="/payment/error" element={<PaymentErrorPage />} />
+            <Route path="/mes-paiements" element={<PaymentHistoryPage />} />
           </Routes>
         </div>
+        <Toaster />
       </Router>
     </QueryClientProvider>
   );

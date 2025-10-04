@@ -19,8 +19,10 @@ import {
   MapPin,
   DollarSign
 } from 'lucide-react';
+import { toast } from 'sonner';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
+import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { useAuthStore } from '../stores/authStore';
@@ -76,6 +78,9 @@ const MyListingsPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [showDropdown, setShowDropdown] = useState<string | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [listingToDelete, setListingToDelete] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -174,36 +179,47 @@ const MyListingsPage: React.FC = () => {
 
       // Update local state
       setListings(prev => prev.map(listing => 
-        listing.id === listingId 
-          ? { ...listing, status: newStatus, updated_at: new Date().toISOString() }
-          : listing
+        listing.id === listingId ? { ...listing, status: newStatus, updated_at: new Date().toISOString() } : listing
       ));
 
       setShowDropdown(null);
+      toast.success('Statut mis à jour avec succès');
     } catch (err) {
       console.error('Error updating listing status:', err);
       setError('Erreur lors de la mise à jour du statut');
+      toast.error('Erreur lors de la mise à jour du statut');
     }
   };
 
   // Handle delete listing
-  const handleDeleteListing = async (listingId: string) => {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer cette annonce ?')) return;
+  const handleDeleteListing = (listingId: string) => {
+    setListingToDelete(listingId);
+    setDeleteDialogOpen(true);
+    setShowDropdown(null);
+  };
+
+  const confirmDeleteListing = async () => {
+    if (!listingToDelete) return;
 
     try {
+      setIsDeleting(true);
       const { error } = await supabase
         .from('listings')
         .delete()
-        .eq('id', listingId);
+        .eq('id', listingToDelete);
 
       if (error) throw error;
 
       // Update local state
-      setListings(prev => prev.filter(listing => listing.id !== listingId));
-      setShowDropdown(null);
+      setListings(prev => prev.filter(listing => listing.id !== listingToDelete));
+      toast.success('Annonce supprimée avec succès');
+      setListingToDelete(null);
     } catch (err) {
       console.error('Error deleting listing:', err);
       setError('Erreur lors de la suppression de l\'annonce');
+      toast.error('Erreur lors de la suppression de l\'annonce');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -386,6 +402,19 @@ const MyListingsPage: React.FC = () => {
       </div>
       
       <Footer />
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmationDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        title="Supprimer l'annonce"
+        description="Êtes-vous sûr de vouloir supprimer cette annonce ? Cette action est irréversible."
+        confirmText="Supprimer"
+        cancelText="Annuler"
+        onConfirm={confirmDeleteListing}
+        variant="destructive"
+        isLoading={isDeleting}
+      />
     </div>
   );
 
